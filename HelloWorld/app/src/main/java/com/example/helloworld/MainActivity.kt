@@ -15,18 +15,44 @@ import java.io.InputStreamReader
 import java.io.StringReader
 
 class MainActivity : AppCompatActivity() {
+    private var items: List<NewItem> = mutableListOf()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val btn = findViewById<Button>(R.id.button)
-
+        items = fillList()
         //btn.setOnClickListener{ setImage() }
         btn.setOnClickListener{ Clickfun_1() }
     }
 
+
+    private fun fillList():List<NewItem>{
+        val list = mutableListOf<NewItem>()
+        val map = mutableMapOf<String, String>()
+        val reader = JsonReader(StringReader(resources.getString(R.string.movies)))
+        reader.beginArray()
+        while (reader.hasNext()) {
+            reader.beginObject()
+            while (reader.hasNext()) map[reader.nextName()] = reader.nextString()
+            reader.endObject()
+            list.add(
+                NewItem(
+                    map["name"] as String,
+                    map["description"] as String,
+                    map["pictures"] as String
+                )
+            )
+        }
+        reader.endArray()
+        return list
+    }
+
+
+
     private fun Clickfun_1()
     {
-        getRes(this)
+        items.forEach{println(it)}
+    //getRes(this)
     }
 
 
