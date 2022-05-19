@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun Clickfun_1()
     {
-        getRes()
+        getRes(this)
     }
 
 

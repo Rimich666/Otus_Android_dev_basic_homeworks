@@ -16,12 +16,12 @@ class NewItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
     private val nameTV: TextView = itemView.findViewById(R.id.textName)
     private val descriptorTV: TextView = itemView.findViewById(R.id.text_short_description)
     private val detailBtn: Button = itemView.findViewById(R.id.button_detail)
-    fun bind(item: NewItem, listener: NewItemsAdapter.NewClickListener){
+    fun bind(item: NewItem, listener: NewItemsAdapter.DetailClickListener){
         nameTV.text = item.name
         descriptorTV.text = item.description
-        val resID = getContext().toString() //.getResources().getIdentifier(item.pictures, "drawable", "com.example.moviesearch")
-        //val resID: Int = getResources().getIdentifier(item.pictures, "drawable", "com.example.moviesearch")
-        //val resID = resources.getIdentifier(item.pictures, "drawable", packageName)
-        imageView.setImageResource(resID)
+        val cont = imageView.context
+        val resId: Int = cont.resources.getIdentifier(item.pictures, "drawable", cont.packageName)
+        imageView.setImageResource(resId)
+        detailBtn.setOnClickListener(listener.onDetailClick(item, adapterPosition))
     }
 }
