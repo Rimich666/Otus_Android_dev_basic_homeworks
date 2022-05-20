@@ -44,6 +44,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initRecycler(){
         val layoutManager = LinearLayoutManager(this)
+        var selectedPosition: Int = -1
         items = fillList()
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = NewItemsAdapter(items, object:NewItemsAdapter.DetailClickListener
@@ -52,6 +53,13 @@ class MainActivity : AppCompatActivity() {
                 println("item: $newsItem       position: $position")
                 Log.d("TAG", "Кнопочка нажата")
                 newsItem.Selected = true
+                if (selectedPosition > -1)
+                {
+                    items[selectedPosition].Selected = false
+                    recyclerView.adapter?.notifyItemChanged(selectedPosition)
+                }
+                selectedPosition = position
+
                 recyclerView.adapter?.notifyItemChanged(position)
                 Toast.makeText(this@MainActivity, "Click", Toast.LENGTH_SHORT).show()
             }

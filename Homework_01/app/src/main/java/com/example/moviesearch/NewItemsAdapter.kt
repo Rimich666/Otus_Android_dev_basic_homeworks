@@ -1,10 +1,11 @@
 package com.example.moviesearch
 
+import android.os.Build
+import android.support.annotation.RequiresApi
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import java.util.*
 
 private const val HEADER_VIEW_TYPE = 0
 private const val TAG = "Tracing"
@@ -19,6 +20,7 @@ class NewItemsAdapter (
             return NewItemsViewHolder(inflater.inflate(R.layout.new_item, parent, false))
         }
 
+        @RequiresApi(Build.VERSION_CODES.M)
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             Log.d(TAG, "onBindViewHolder : $position")
             when (holder)

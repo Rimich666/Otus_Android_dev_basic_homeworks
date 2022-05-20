@@ -1,14 +1,13 @@
 package com.example.moviesearch
 
-import android.content.Context
-import android.graphics.drawable.Drawable
+import android.os.Build
+import android.support.annotation.RequiresApi
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import java.security.AccessController.getContext
-import kotlin.coroutines.coroutineContext
 
 
 class NewItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
@@ -16,11 +15,20 @@ class NewItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
     private val nameTV: TextView = itemView.findViewById(R.id.textName)
     private val descriptorTV: TextView = itemView.findViewById(R.id.text_short_description)
     private val detailBtn: Button = itemView.findViewById(R.id.button_detail)
+    @RequiresApi(Build.VERSION_CODES.M)
     fun bind(item: NewItem, listener: NewItemsAdapter.DetailClickListener){
+        Log.d("Bind", "Selected: ${item.Selected}")
         nameTV.text = item.name
         descriptorTV.text = item.description
-        if (item.Selected){itemView.background = }
         val cont = imageView.context
+        var back_color = cont.resources.getColor(R.color.white, cont.theme)
+        var font_color = cont.resources.getColor(R.color.black, cont.theme)
+        if(item.Selected)
+           {back_color = cont.resources.getColor(R.color.back_sel_item, cont.theme)
+            font_color = cont.resources.getColor(R.color.font_sel_item, cont.theme)}
+        itemView.setBackgroundColor(back_color)
+        nameTV.setTextColor(font_color)
+
         val resId: Int = cont.resources.getIdentifier(item.pictures, "drawable", cont.packageName)
         imageView.setImageResource(resId)
         detailBtn.setOnClickListener{(listener.onDetailClick(item, adapterPosition))}
