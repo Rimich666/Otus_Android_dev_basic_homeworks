@@ -19,9 +19,10 @@ class NewItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
     fun bind(item: NewItem, listener: NewItemsAdapter.DetailClickListener){
         nameTV.text = item.name
         descriptorTV.text = item.description
+        if (item.Selected){itemView.background = }
         val cont = imageView.context
         val resId: Int = cont.resources.getIdentifier(item.pictures, "drawable", cont.packageName)
         imageView.setImageResource(resId)
-        detailBtn.setOnClickListener(listener.onDetailClick(item, adapterPosition))
+        detailBtn.setOnClickListener{(listener.onDetailClick(item, adapterPosition))}
     }
 }

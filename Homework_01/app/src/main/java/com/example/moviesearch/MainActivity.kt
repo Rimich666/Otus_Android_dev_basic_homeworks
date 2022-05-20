@@ -6,11 +6,12 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.JsonReader
 import android.util.Log
+import android.widget.Toast
 import java.io.StringReader
 
 class MainActivity : AppCompatActivity() {
     private val recyclerView by lazy {findViewById<RecyclerView>(R.id.recycler_view)}
-    private val items: List<NewItem> = mutableListOf()
+    private var items: List<NewItem> = mutableListOf()
 
     private fun fillList():List<NewItem>{
         val list = mutableListOf<NewItem>()
@@ -25,7 +26,8 @@ class MainActivity : AppCompatActivity() {
                 NewItem(
                     map["name"] as String,
                     map["description"] as String,
-                    map["pictures"] as String
+                    map["pictures"] as String,
+                    false
                 )
             )
         }
@@ -37,11 +39,22 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        initRecycler()
     }
-    
+
     private fun initRecycler(){
         val layoutManager = LinearLayoutManager(this)
+        items = fillList()
         recyclerView.layoutManager = layoutManager
-        recyclerView.adapter = NewItemsAdapter(items, object: )
+        recyclerView.adapter = NewItemsAdapter(items, object:NewItemsAdapter.DetailClickListener
+        {
+            override fun onDetailClick(newsItem: NewItem, position: Int) {
+                println("item: $newsItem       position: $position")
+                Log.d("TAG", "Кнопочка нажата")
+                newsItem.Selected = true
+                recyclerView.adapter?.notifyItemChanged(position)
+                Toast.makeText(this@MainActivity, "Click", Toast.LENGTH_SHORT).show()
+            }
+        } )
     }
 }
