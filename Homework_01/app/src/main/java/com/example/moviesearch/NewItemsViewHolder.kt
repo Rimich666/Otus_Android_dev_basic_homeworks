@@ -17,7 +17,6 @@ class NewItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
     private val detailBtn: Button = itemView.findViewById(R.id.button_detail)
     @RequiresApi(Build.VERSION_CODES.M)
     fun bind(item: NewItem, listener: NewItemsAdapter.DetailClickListener){
-     //   Log.d("Bind", "Selected: ${item.Selected}")
         nameTV.text = item.name
         descriptorTV.text = item.description
         val cont = imageView.context
@@ -31,6 +30,6 @@ class NewItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
 
         val resId: Int = cont.resources.getIdentifier(item.pictures, "drawable", cont.packageName)
         imageView.setImageResource(resId)
-        detailBtn.setOnClickListener{(listener.onDetailClick(item, adapterPosition))}
+        detailBtn.setOnClickListener{(listener.onDetailClick(item, absoluteAdapterPosition))}
     }
 }

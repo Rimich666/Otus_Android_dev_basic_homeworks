@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
     private var items: List<NewItem> = mutableListOf()
     private var selectedPosition: Int = -1
     val detailLauncher = registerForActivityResult(DetailActivityContract()) { result ->
-        println("result: $result ")
+        Log.d("poin 8 with *","Результат закрытия второго экрана: $result ")
     }
 
     private fun fillList():List<NewItem>{
@@ -44,41 +44,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("tracing", "onCreate ------------------------------------------")
         setContentView(R.layout.activity_main)
         initRecycler()
-
     }
 
-
-    override fun onStart() {
-        super.onStart()
-        Log.d("tracing","onStart ------------------------------------------")
-
-
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.d("tracing","он пауза ------------------------------------------")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("tracing","он дестрой ------------------------------------------")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Log.d("tracing","onResume ------------------------------------------")
-    }
 
    override fun onSaveInstanceState(outState: Bundle) {
        super.onSaveInstanceState(outState)
-       Log.d("tracing","Вот сэйв инстанс стейт, позишн = $selectedPosition")
        outState.putInt("selected", selectedPosition)
-
     }
+
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         if (selectedPosition > -1)
@@ -88,6 +63,8 @@ class MainActivity : AppCompatActivity() {
         }
         Log.d("tracing","А это рестор инстанс стейт, позишн = $selectedPosition")
     }
+
+
     private fun initRecycler(){
         val layoutManager =
             LinearLayoutManager(this)
@@ -106,10 +83,7 @@ class MainActivity : AppCompatActivity() {
 
                 recyclerView.adapter?.notifyItemChanged(position)
 
-                //val putBundle: Bundle = newsItem.bundle
-                //putBundle.putInt("index", selectedPosition)
                 detailLauncher.launch(newsItem.bundle)
-                //Toast.makeText(this@MainActivity, "Click", Toast.LENGTH_SHORT).show()
             }
         } )
     }
