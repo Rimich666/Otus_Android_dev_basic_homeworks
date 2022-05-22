@@ -1,6 +1,8 @@
 package com.example.moviesearch
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -12,6 +14,8 @@ import java.io.StringReader
 class MainActivity : AppCompatActivity() {
     private val recyclerView by lazy {findViewById<RecyclerView>(R.id.recycler_view)}
     private var items: List<NewItem> = mutableListOf()
+    private var selectedPosition: Int = -1
+
 
     private fun fillList():List<NewItem>{
         val list = mutableListOf<NewItem>()
@@ -38,20 +42,58 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("tracing","onCreate ------------------------------------------")
         setContentView(R.layout.activity_main)
         initRecycler()
+        val detailLauncher = registerForActivityResult(DetailActivityContract())
     }
 
+
+    override fun onStart() {
+        super.onStart()
+        Log.d("tracing","onStart ------------------------------------------")
+
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("tracing","он пауза ------------------------------------------")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("tracing","он дестрой ------------------------------------------")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("tracing","onResume ------------------------------------------")
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        Log.d("tracing","Вот сэйв инстанс стейт, позишн = $selectedPosition")
+        outState.putInt("selected", selectedPosition)
+
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        selectedPosition = savedInstanceState.getInt("selected")
+        if (selectedPosition > -1)
+        {
+            items[selectedPosition].Selected = true
+            recyclerView.adapter?.notifyItemChanged(selectedPosition)
+        }
+    }
     private fun initRecycler(){
         val layoutManager = LinearLayoutManager(this)
-        var selectedPosition: Int = -1
         items = fillList()
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = NewItemsAdapter(items, object:NewItemsAdapter.DetailClickListener
         {
             override fun onDetailClick(newsItem: NewItem, position: Int) {
-                println("item: $newsItem       position: $position")
-                Log.d("TAG", "Кнопочка нажата")
                 newsItem.Selected = true
                 if (selectedPosition > -1)
                 {
@@ -61,6 +103,12 @@ class MainActivity : AppCompatActivity() {
                 selectedPosition = position
 
                 recyclerView.adapter?.notifyItemChanged(position)
+                val strItem = newsItem.toString()
+                /*val intent = Intent(this@MainActivity, DetailActivity::class.java).apply {
+                    putExtra("item", strItem)
+                }
+                startActivity(intent)*/
+
                 Toast.makeText(this@MainActivity, "Click", Toast.LENGTH_SHORT).show()
             }
         } )

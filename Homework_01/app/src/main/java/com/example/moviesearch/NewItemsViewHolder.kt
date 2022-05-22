@@ -17,7 +17,7 @@ class NewItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
     private val detailBtn: Button = itemView.findViewById(R.id.button_detail)
     @RequiresApi(Build.VERSION_CODES.M)
     fun bind(item: NewItem, listener: NewItemsAdapter.DetailClickListener){
-        Log.d("Bind", "Selected: ${item.Selected}")
+     //   Log.d("Bind", "Selected: ${item.Selected}")
         nameTV.text = item.name
         descriptorTV.text = item.description
         val cont = imageView.context

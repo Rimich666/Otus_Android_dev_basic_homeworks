@@ -22,7 +22,7 @@ class NewItemsAdapter (
 
         @RequiresApi(Build.VERSION_CODES.M)
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            Log.d(TAG, "onBindViewHolder : $position")
+            //Log.d(TAG, "onBindViewHolder : $position")
             when (holder)
             {
                 is NewItemsViewHolder ->
