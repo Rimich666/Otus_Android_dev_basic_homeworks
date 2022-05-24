@@ -16,6 +16,7 @@ import java.io.StringReader
 class MainActivity : AppCompatActivity() {
     private val recyclerView by lazy {findViewById<RecyclerView>(R.id.recycler_view)}
     private var items: List<NewItem> = mutableListOf()
+    private var favorites_list: List<NewItem> = mutableListOf()
     private var selectedPosition: Int = -1
     val detailLauncher = registerForActivityResult(DetailActivityContract()) { result ->
         Log.d("poin 8 with *","Результат закрытия второго экрана: $result ")

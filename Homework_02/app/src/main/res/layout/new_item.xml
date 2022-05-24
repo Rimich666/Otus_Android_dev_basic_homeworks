@@ -60,4 +60,15 @@
         app:layout_constraintTop_toBottomOf="@+id/text_short_description"
         android:text="@string/butt_detail"
         android:layout_marginStart="5dp"/>
+    <ImageView
+        android:id="@+id/heart_image"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintHeight_percent="0.3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="2:3"
+        app:layout_constraintTop_toBottomOf="@+id/text_short_description"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:src="@sample/pictures"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

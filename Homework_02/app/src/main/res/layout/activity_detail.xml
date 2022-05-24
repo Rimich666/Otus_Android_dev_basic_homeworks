@@ -73,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
                 tools:text="@sample/description_long"/>
 
         </TableRow>
@@ -351,7 +351,7 @@
         android:layout_height="0dp"
         android:layout_marginStart="5dp"
         android:layout_marginBottom="5dp"
-        android:text="Пригласить друга"
+        android:text="@string/invite_friend"
         app:layout_constraintHeight_default="percent"
         app:layout_constraintHeight_percent="0.09"
         app:layout_constraintWidth_default="percent"
