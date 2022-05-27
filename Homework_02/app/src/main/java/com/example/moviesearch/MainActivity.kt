@@ -26,7 +26,8 @@ class MainActivity : AppCompatActivity() {
         Log.d("poin 8 with *","Результат закрытия второго экрана: $result ")
     }
     val favoritesLauncher = registerForActivityResult(FavoritesActivityContract()) { result ->
-        Log.d("","Результат закрытия списка избранного: $result ")
+        favorites = Items(result)
+        Log.d("","Результат закрытия списка избранного: ${favorites.toString()} ")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

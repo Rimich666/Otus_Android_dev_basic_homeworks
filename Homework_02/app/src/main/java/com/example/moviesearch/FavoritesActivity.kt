@@ -20,7 +20,7 @@ class FavoritesActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        val result = Intent().putExtra("msg", "Возврат из списка избранного")
+        val result = Intent().putExtras(items.bundle)
         setResult(RESULT_OK, result)
         super.onBackPressed()
     }
@@ -36,8 +36,8 @@ class FavoritesActivity : AppCompatActivity() {
         recyclerView.adapter = FavoriteItemsAdapter(items.list, object:FavoriteItemsAdapter.FavoritesClickListener
         {
             override fun onHeartClick(item: NewItem, position: Int) {
-
-                recyclerView.adapter?.notifyItemChanged(position)
+                items.remove(position)
+                recyclerView.adapter?.notifyItemRemoved(position)
             }
         } )
     }

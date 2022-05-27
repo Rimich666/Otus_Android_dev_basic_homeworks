@@ -7,17 +7,17 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
 
-class FavoritesActivityContract : ActivityResultContract<Bundle, String>() {
+class FavoritesActivityContract : ActivityResultContract<Bundle, Bundle>() {
 
 
     override fun createIntent(context: Context, input: Bundle): Intent {
         return Intent(context, FavoritesActivity::class.java).putExtras(input)
     }
 
-    override fun parseResult(resultCode: Int, intent: Intent?):String {
+    override fun parseResult(resultCode: Int, intent: Intent?):Bundle {
         if (resultCode == Activity.RESULT_OK){
-            Log.d("FavoritesContract", intent?.getStringExtra("msg") as String)
+            //Log.d("FavoritesContract", intent?.getStringExtra("msg") as String)
         }
-        return intent?.getStringExtra("msg") as String
+        return intent?.getExtras() as Bundle
     }
 }

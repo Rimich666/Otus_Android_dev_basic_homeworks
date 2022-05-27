@@ -28,11 +28,6 @@ data class NewItem(val name: String, val description: String, val pictures: Stri
             "selected" to Selected
         )
 
-    val map: Map<String, *>
-        get() = mapOf("name" to name,
-            "description" to description,
-            "pictures" to pictures,
-            "Selected" to Selected)
 }
 
 class Items()
@@ -78,6 +73,10 @@ class Items()
     fun add(item: NewItem)
     {
         _list.add(item)
+    }
+
+    fun remove(position:Int){
+        _list.removeAt(position)
     }
 
     override fun toString(): String {
