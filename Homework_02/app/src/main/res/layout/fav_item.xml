@@ -7,7 +7,7 @@
 
     <ImageView
         app:layout_constraintWidth_default="percent"
-        android:id="@+id/image"
+        android:id="@+id/image_fav"
         android:layout_width="0dp"
         app:layout_constraintWidth_percent="0.25"
         android:layout_height="0dp"
@@ -18,13 +18,14 @@
         tools:src="@sample/pictures" />
 
     <TextView
-        android:id="@+id/textName"
+        android:id="@+id/textName_fav"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="percent"
-        app:layout_constraintHeight_percent="0.4"
-        app:layout_constraintStart_toEndOf="@+id/image"
+        app:layout_constraintHeight_percent="0.5"
+        app:layout_constraintStart_toEndOf="@+id/image_fav"
+        app:layout_constraintEnd_toStartOf="@id/heart_image_fav"
         app:layout_constraintTop_toTopOf="parent"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -33,42 +34,33 @@
         android:gravity="center_vertical"
         tools:text="@sample/names" />
 
+    <ImageView
+        android:id="@+id/heart_image_fav"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintHeight_percent="0.5"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:src="@drawable/heart_broken130"
+        tools:src="@sample/icons"
+        />
+
     <TextView
-        android:id="@+id/text_short_description"
+        android:id="@+id/text_short_description_fav"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="percent"
-        app:layout_constraintHeight_percent="0.3"
-        app:layout_constraintStart_toEndOf="@+id/image"
-        app:layout_constraintTop_toBottomOf="@+id/textName"
+        app:layout_constraintHeight_percent="0.5"
+        app:layout_constraintStart_toEndOf="@+id/image_fav"
+        app:layout_constraintTop_toBottomOf="@+id/textName_fav"
         android:paddingStart="10dp"
         android:textSize="14sp"
         android:textColor="@color/black"
         android:gravity="center_vertical"
         tools:text="@sample/description_short" />
 
-    <Button
-        android:id="@+id/button_detail"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintHeight_percent="0.3"
-        app:layout_constraintWidth_default="percent"
-        app:layout_constraintWidth_percent="0.3"
-        app:layout_constraintStart_toEndOf="@+id/image"
-        app:layout_constraintTop_toBottomOf="@+id/text_short_description"
-        android:text="@string/butt_detail"
-        android:layout_marginStart="5dp"/>
-    <ImageView
-        android:id="@+id/heart_image"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintHeight_percent="0.3"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintTop_toBottomOf="@+id/text_short_description"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:src="@sample/icons"
-        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

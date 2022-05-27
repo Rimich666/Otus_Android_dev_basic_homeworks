@@ -15,6 +15,7 @@ class NewItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
     private val nameTV: TextView = itemView.findViewById(R.id.textName)
     private val descriptorTV: TextView = itemView.findViewById(R.id.text_short_description)
     private val detailBtn: Button = itemView.findViewById(R.id.button_detail)
+    private val heartIm: ImageView = itemView.findViewById(R.id.heart_image)
     @RequiresApi(Build.VERSION_CODES.M)
     fun bind(item: NewItem, listener: NewItemsAdapter.DetailClickListener){
         nameTV.text = item.name
@@ -27,9 +28,12 @@ class NewItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
             font_color = cont.resources.getColor(R.color.font_sel_item, cont.theme)}
         itemView.setBackgroundColor(back_color)
         nameTV.setTextColor(font_color)
+        heartIm.setImageResource(R.drawable.heart130)
 
         val resId: Int = cont.resources.getIdentifier(item.pictures, "drawable", cont.packageName)
         imageView.setImageResource(resId)
         detailBtn.setOnClickListener{(listener.onDetailClick(item, absoluteAdapterPosition))}
+        itemView.setOnLongClickListener{(listener.onItemLongClick(item, absoluteAdapterPosition))}
+        heartIm.setOnClickListener{(listener.onHeartClick(item, absoluteAdapterPosition))}
     }
 }

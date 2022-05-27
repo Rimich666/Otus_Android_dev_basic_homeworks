@@ -35,4 +35,5 @@
             }
         ]</string>
     <string name="invite_friend">Пригласить друга</string>
+    <string name="action_favorites">Избранное</string>
 </resources>
