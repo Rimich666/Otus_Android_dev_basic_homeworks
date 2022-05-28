@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.GridLayoutManager
 import java.io.StringReader
@@ -70,6 +71,20 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onBackPressed() {
+        AlertDialog.Builder(this)
+            .setTitle("Предупреждение")
+            .setMessage("Вы действительно хотите выйти из приложения?")
+            .setPositiveButton("Да") { dialog, which ->
+                super.onBackPressed()
+                //Toast.makeText(applicationContext, "OK is pressed", Toast.LENGTH_LONG).show()
+            }
+            .setNegativeButton("Нет") { dialog, which ->
+                Toast.makeText(applicationContext, "Ну ладно", Toast.LENGTH_LONG).show()
+            }
+            .show()
+
+    }
 
     private fun initRecycler(){
         val layoutManager = if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) GridLayoutManager(this, 2) else LinearLayoutManager(this)
