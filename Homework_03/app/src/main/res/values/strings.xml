@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">Поиск фильмов</string>
+    <string name="butt_detail">Детали</string>
+    <string name="movies" translatable="false">
+        [
+            {
+                \"name\": \"Зеленая миля\",
+                \"description\": \"The Green Mile, 1999, 189 мин.\",
+                \"pictures\": \"greenmile\"
+            },
+            {
+                \"name\": \"Список Шиндлера\",
+                \"description\": \"Schindler\'s List, 1993, 195 мин.\",
+                \"pictures\": \"schindlerslist\"},
+            {
+                \"name\": \"Побег из Шоушенка\",
+                \"description\": \"The Shawshank Redemption, 1994, 142 мин.\",
+                \"pictures\": \"shawshankredemption\"
+            },
+            {
+                \"name\": \"Властелин колец: Возвращение короля\",
+                \"description\": \"The Lord of the Rings: The Return of the King, 2003, 201 мин.\",
+                \"pictures\": \"returnking\"
+            },
+            {
+                \"name\": \"Форрест Гамп\",
+                \"description\": \"Forrest Gump, 1994, 142 мин.\",
+                \"pictures\": \"forrestgump\"
+            },
+            {
+                \"name\": \"Властелин колец: Две крепости\",
+                \"description\":
+                \"The Lord of the Rings: The Two Towers, 2002, 179 мин.\",
+                \"pictures\": \"twotowers\"
+            }
+        ]</string>
+    <string name="invite_friend">Пригласить друга</string>
+    <string name="action_favorites">Избранное</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_bottom_nav">BottomNavActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+</resources>
