@@ -12,7 +12,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.snackbar.Snackbar
 
-class MainActivity : AppCompatActivity(), ListMovieFragment.Host {
+class MainActivity : AppCompatActivity(),
+    ListMovieFragment.Host,
+    FavouritesFragment.Host {
 
     private var favourites: ArrayList<Int> = arrayListOf()
     private lateinit var items: Items
@@ -42,34 +44,29 @@ class MainActivity : AppCompatActivity(), ListMovieFragment.Host {
 
     }
 
+    private val list_fragment = {supportFragmentManager.beginTransaction()
+        .replace(R.id.container, ListMovieFragment.newInstance(items.bundle, favourites))
+        .commit()}
+
+    private val favourites_fragment_fun = {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.container, FavouritesFragment.newInstance(items.select(favourites).bundle))
+            .commit()
+    }
+
+
     private fun itemSelected (mI: MenuItem): Boolean
     {
         when (mI.itemId) {
             R.id.navigation_list -> {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, ListMovieFragment.newInstance(items.bundle, favourites))
-                    .commit()
-                Log.d("Ботомное меню", "Домик")
+                list_fragment()
                 return true
             }
             R.id.navigation_favorites -> {
-                Log.d("supportFragmentManager", "Фавориты: ${favourites.toString()}")
-                supportFragmentManager.setFragmentResultListener("del_fav", this){
-                    _, result ->
-                    val pos = result.getInt("pos")
-                    likedItem(favourites[pos], false)
- //                   items[favourites[pos]].liked = false
- //                   favourites.removeAt(pos)
-                }
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.container, FavouritesFragment.newInstance(items.select(favourites).bundle, favourites))
-                        .commit()
-
-                Log.d("Ботомное меню", "Панель инструментов")
+                favourites_fragment_fun()
                 return true
             }
             R.id.navigation_notifications -> {
-                Log.d("Ботомное меню", "Сообщения")
                 return true
             }
         }
@@ -109,14 +106,26 @@ class MainActivity : AppCompatActivity(), ListMovieFragment.Host {
     }
 
     override fun likedItem(position: Int, liked: Boolean) {
-        rem_add_fav(position, liked)
+        changeLiked(position, liked, list_fragment)
+    }
+
+    override fun dislike(pos: Int) {
+        changeLiked(favourites[pos], false, favourites_fragment_fun)
+    }
+
+    private fun changeLiked(pos: Int, liked: Boolean, func: () -> Int){
+        Log.d("changeLiked", "Ну таг всё сказал: это чейнж лайкед")
+        rem_add_fav(pos, liked)
         val map = mapOf<Boolean, String>(true to "добавили", false to "удалили")
         val zakus = Snackbar.make(
             findViewById(R.id.container),
-            "Вы успешно ${map[liked]} фильм: ${items[position].name}",
+            "Вы успешно ${map[liked]} фильм: ${items[pos].name}",
             Snackbar.LENGTH_LONG)
-        zakus.setAction("Отменить", View.OnClickListener { rem_add_fav(position, !liked) })
+        zakus.setAction("Отменить", View.OnClickListener {
+            rem_add_fav(pos, !liked)
+            func()})
         zakus.show()
+
     }
 
     private fun rem_add_fav(pos: Int, liked: Boolean){

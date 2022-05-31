@@ -1,5 +1,6 @@
 package com.example.moviesearch
 
+import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -14,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ITEMS = "items"
-private const val FAVOR = "favourites"
 
 /**
  * A simple [Fragment] subclass.
@@ -26,13 +26,13 @@ class FavouritesFragment : Fragment() {
     private var items: Items = Items()
     private var favourites: ArrayList<Int> = arrayListOf()
     private lateinit var recyclerView :RecyclerView
+    private lateinit var host: Host
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             items = Items(it.getBundle(ITEMS) as Bundle)
             Log.d("FavouritesFragment", "Список получили: $items")
-            favourites = it.getIntegerArrayList(FAVOR) as ArrayList<Int>
         }
     }
 
@@ -44,6 +44,11 @@ class FavouritesFragment : Fragment() {
         initRecycler(view)
         // Inflate the layout for this fragment
         return view
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        host = context as Host
     }
 
     private fun initRecycler(view: View){
@@ -58,6 +63,7 @@ class FavouritesFragment : Fragment() {
                 parentFragmentManager.setFragmentResult("del_fav", result)
                 items.remove(position)
                 recyclerView.adapter?.notifyItemRemoved(position)
+                host.dislike(position)
             }
         } )
     }
@@ -73,12 +79,15 @@ class FavouritesFragment : Fragment() {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: Bundle, param2: ArrayList<Int>) =
+        fun newInstance(param1: Bundle) =
             FavouritesFragment().apply {
                 arguments = Bundle().apply {
                     putBundle(ITEMS, param1)
-                    putIntegerArrayList(FAVOR, param2)
                 }
             }
+    }
+
+    interface Host{
+        fun dislike(pos:Int)
     }
 }
