@@ -5,10 +5,12 @@ import android.text.TextUtils.replace
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
+import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity(), ListMovieFragment.Host {
 
@@ -55,8 +57,9 @@ class MainActivity : AppCompatActivity(), ListMovieFragment.Host {
                 supportFragmentManager.setFragmentResultListener("del_fav", this){
                     _, result ->
                     val pos = result.getInt("pos")
-                    items[favourites[pos]].liked = false
-                    favourites.removeAt(pos)
+                    likedItem(favourites[pos], false)
+ //                   items[favourites[pos]].liked = false
+ //                   favourites.removeAt(pos)
                 }
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.container, FavouritesFragment.newInstance(items.select(favourites).bundle, favourites))
@@ -96,6 +99,7 @@ class MainActivity : AppCompatActivity(), ListMovieFragment.Host {
 
     override fun showDetail(position:Int, item: Bundle){
         Log.d("showDetail", "Слава тебе ... яйца!!! ЗАРАБОТАЛО, мля")
+
         if (selectedPosition > -1){ items[selectedPosition].Selected = false }
         selectedPosition = position
         items[position].Selected = true
@@ -104,9 +108,21 @@ class MainActivity : AppCompatActivity(), ListMovieFragment.Host {
             .commit()
     }
 
-    override fun likedItem(position: Int, liked: Boolean){
-        items[position].liked = liked
-        if (liked){favourites.add(position)}
-        else{ favourites.remove(position) }
+    override fun likedItem(position: Int, liked: Boolean) {
+        rem_add_fav(position, liked)
+        val map = mapOf<Boolean, String>(true to "добавили", false to "удалили")
+        val zakus = Snackbar.make(
+            findViewById(R.id.container),
+            "Вы успешно ${map[liked]} фильм: ${items[position].name}",
+            Snackbar.LENGTH_LONG)
+        zakus.setAction("Отменить", View.OnClickListener { rem_add_fav(position, !liked) })
+        zakus.show()
+    }
+
+    private fun rem_add_fav(pos: Int, liked: Boolean){
+        items[pos].liked = liked
+        if (liked){favourites.add(pos)}
+        else{ favourites.remove(pos)}
+        Log.d("rem_add_fav", "Список избранного: ${items.select(favourites)}")
     }
 }

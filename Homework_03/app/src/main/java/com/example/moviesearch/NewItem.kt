@@ -6,12 +6,13 @@ import android.util.Log
 import androidx.core.os.bundleOf
 import java.io.StringReader
 
-data class NewItem(val name: String, val description: String, val pictures: String, var Selected: Boolean, var liked: Boolean)
+data class NewItem(val name: String, val description: String, val pictures: String, var poster: String ,var Selected: Boolean, var liked: Boolean)
 {
     constructor(itmap:Map<String,String>, Selected: Boolean, liked: Boolean):this(
         itmap["name"] as String,
         itmap["description"] as String,
         itmap["pictures"] as String,
+        itmap["poster"] as String,
         Selected,
         liked)
 
@@ -19,17 +20,21 @@ data class NewItem(val name: String, val description: String, val pictures: Stri
         bundle["name"] as String,
         bundle["description"] as String,
         bundle["pictures"] as String,
+        bundle["poster"] as String,
         bundle["selected"] as Boolean,
         bundle["liked"] as Boolean)
 
     val bundle: Bundle
-        get() = bundleOf(
-            "name" to name,
-            "description" to description,
-            "pictures" to pictures,
-            "selected" to Selected,
-            "liked" to liked
-        )
+        get() {
+            return bundleOf(
+                "name" to name,
+                "description" to description,
+                "pictures" to pictures,
+                "poster" to poster,
+                "selected" to Selected,
+                "liked" to liked
+            )
+        }
 
 }
 
@@ -45,6 +50,8 @@ class Items()
             reader.beginObject()
             while (reader.hasNext()) map[reader.nextName()] = reader.nextString()
             reader.endObject()
+            Log.d("NewItem", "----------------------------")
+            Log.d("NewItem", "Вот что: ${map.toString()}")
             _list.add(NewItem(map, false, false)
             )
         }
