@@ -1,9 +1,10 @@
 package com.example.helloworld
 
+import android.content.Intent
 import android.content.res.Resources
 import android.media.Image
 import android.net.Uri
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.JsonReader
 import android.util.Log
@@ -51,7 +52,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun Clickfun_1()
     {
-        items.forEach{println(it)}
+        val intent = Intent(this@MainActivity, SecondActivity::class.java)
+        startActivity(intent)
+        //items.forEach{println(it)}
     //getRes(this)
     }
 
