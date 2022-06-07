@@ -65,11 +65,11 @@ class MainActivity : AppCompatActivity() {
         Executors.newSingleThreadScheduledExecutor().execute(
             Runnable {
                 db = DbObject.getDatabase(this.applicationContext)
-                Log.d("------appDb", db.toString())
+  /*              Log.d("------appDb", db.toString())
                 val film = Film("name3", 1,"short description3", "preview url3")
                 val film2 = Film("name4", 1,"short description4", "preview url4")
                 db?.filmDao()?.insert(film)
-                db?.filmDao()?.insert(film2)
+                db?.filmDao()?.insert(film2)*/
             }
         )
 
@@ -144,18 +144,20 @@ class MainActivity : AppCompatActivity() {
 
     private fun request()
     {
+        var page: Int = 1
+        var pagesCount: Int = 1
 
         val urlBuilder : HttpUrl.Builder = HttpUrl.parse(URL)?.newBuilder() ?: error("URL не удался")
         urlBuilder.addQueryParameter("token","MKRJKN4-Q0B463J-J85RBPK-ENWYABY")
 //       urlBuilder.addQueryParameter("search","435")
 //        urlBuilder.addQueryParameter("field","id")
 
-        urlBuilder.addQueryParameter("search","1999")
+/*        urlBuilder.addQueryParameter("search","1999")
         urlBuilder.addQueryParameter("field","year")
         urlBuilder.addQueryParameter("search","Зеленая миля")
-        urlBuilder.addQueryParameter("field","name")
-
-        urlBuilder.addQueryParameter("limit","2")
+        urlBuilder.addQueryParameter("field","name")*/
+        urlBuilder.addQueryParameter("page","2")
+//        urlBuilder.addQueryParameter("limit","2")
         val url : String = urlBuilder.build().toString()
         val request: Request = Request.Builder().url(url).build()
 
@@ -164,13 +166,45 @@ class MainActivity : AppCompatActivity() {
                 Log.d("response", "вот чёт то не удалось")
             }
 
+            private val itemMap: MutableMap<String, Any> = mutableMapOf(
+                "id" to 0,
+                "name" to "",
+                "shortDescription" to "",
+                "alternativeName" to "",
+                "poster" to "",
+                "previewUrl" to ""
+            )
+
+            private fun readObject(reader: JsonReader){
+                var nm: String
+                reader.beginObject()
+                while (reader.hasNext()) {
+                    if(reader.peek()!=JsonToken.NAME) reader.skipValue()
+                    nm = reader.nextName()
+                    Log.d("response", nm)
+                    if(reader.peek() == JsonToken.NULL) reader.skipValue()
+                    if (itemMap.containsKey(nm)) {
+                        when (reader.peek()){
+                            JsonToken.STRING -> itemMap[nm] = reader.nextString()
+                            JsonToken.NUMBER -> itemMap[nm] = reader.nextInt()
+                            JsonToken.BEGIN_OBJECT -> readObject(reader)
+                            JsonToken.END_OBJECT ->{}
+                            else -> reader.skipValue()
+                        }
+                    }
+                    else reader.skipValue()
+                }
+                reader.endObject()
+            }
+
+
             override fun onResponse(call: Call, response: Response) {
                 Log.d("response", "---------------------------------")
 
                 val json = response.body()?.string()
                 val reader = JsonReader(StringReader(json))
                 var nm: String
-                var jt: JsonToken
+
                 Log.d("response", "вот он респонс сырой: $json")
                 reader.beginObject()
                 while (reader.hasNext()) {
@@ -178,24 +212,9 @@ class MainActivity : AppCompatActivity() {
                     if (nm == "docs") {
                         reader.beginArray()
                         while (reader.hasNext()) {
-                            reader.beginObject()
-                            while (reader.hasNext()) {
-                                nm = reader.nextName()
-                                Log.d("response", nm)
-
-                                when (nm) {
-                                    "id" -> Log.d("response", "id = ${reader.nextInt()}")
-                                    "shortDescription" -> Log.d(
-                                        "response",
-                                        "shortDescription = ${reader.nextString()}"
-                                    )
-                                    else -> {
-                                        Log.d("response", "ну да где то здесь")
-                                        reader.skipValue()
-                                    }
-                                }
-                            }
-                            reader.endObject()
+                            readObject(reader)
+                            Log.d("film_add", itemMap.toString())
+                            db?.filmDao()?.insert(Film(itemMap))
                         }
                         reader.endArray()
                     }
