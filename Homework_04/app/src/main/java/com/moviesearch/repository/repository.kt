@@ -1,8 +1,7 @@
 package com.moviesearch.repository
 
-import com.moviesearch.R
 import com.moviesearch.UI.NewItem
-import com.moviesearch.viewmodel.Items
+import com.moviesearch.datasource.remotedata.LoadData
 
 class repository {
 
@@ -12,5 +11,10 @@ class repository {
 
     fun loadMovieList(){
 
+    }
+
+    fun initData(progress: (msg: String)->Unit) {
+        progress("Привет из репозитория")
+        LoadData.initBase(progress)
     }
 }

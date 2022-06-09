@@ -10,8 +10,15 @@ data class Film(
     @ColumnInfo(name = "id_kp") val idKp: Int,
     @ColumnInfo(name = "short_description") val shortDescription: String,
     @ColumnInfo(name = "preview_url") val previewUrl: String,
-    @ColumnInfo(name = "preview_local") val previewLocal: String
+    @ColumnInfo(name = "alternativeName") val previewLocal: String
 ) {
+    constructor(map: Map<String, *>):this(
+        map["name"] as String,
+        map["id"] as Int,
+        map["shortDescription"] as String,
+        map["previewUrl"] as String,
+        map["alternativeName"] as String
+    )
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
 }

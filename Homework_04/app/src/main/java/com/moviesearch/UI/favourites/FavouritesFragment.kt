@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,25 +16,22 @@ import androidx.recyclerview.widget.RecyclerView
 import com.moviesearch.UI.NewItem
 import com.moviesearch.R
 import com.moviesearch.viewmodel.Items
+import com.moviesearch.viewmodel.MainViewModel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ITEMS = "items"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [FavouritesFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class FavouritesFragment : Fragment() {
-    // TODO: Rename and change types of parameters
     private var items: Items = Items()
     private var favourites: ArrayList<Int> = arrayListOf()
     private lateinit var recyclerView :RecyclerView
     private lateinit var host: Host
 
+    private lateinit var mainModel: MainViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
+        mainModel.currFragment = "favr"
         arguments?.let {
             items = Items(it.getBundle(ITEMS) as Bundle)
             Log.d("FavouritesFragment", "Список получили: $items")

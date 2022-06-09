@@ -6,32 +6,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.lifecycle.ViewModelProvider
 import com.moviesearch.R
+import com.moviesearch.viewmodel.MainViewModel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val NAME = "name"
 private const val DESC = "description"
 private const val PICT = "pictures"
 private const val POSTER = "poster"
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-
-/**
- * A simple [Fragment] subclass.
- * Use the [DetailFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class DetailFragment : androidx.fragment.app.Fragment() {
     private var name: String? = null
     private var description: String? = null
     //private var pictures: String? = null
     private var poster: String? = null
+
+    private lateinit var mainModel: MainViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
+        mainModel.currFragment = "detl"
 //        getActivity()?.actionBar?.hide()
         arguments?.let {
             name = it.getString(NAME)

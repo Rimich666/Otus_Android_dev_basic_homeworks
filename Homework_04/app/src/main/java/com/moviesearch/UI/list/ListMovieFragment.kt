@@ -7,6 +7,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.moviesearch.UI.NewItem
 import com.moviesearch.R
 import com.moviesearch.viewmodel.Items
+import com.moviesearch.viewmodel.MainViewModel
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -28,7 +32,6 @@ private const val FAVOR = "favorites"
  * create an instance of this fragment.
  */
 class ListMovieFragment : Fragment() {
-    // TODO: Rename and change types of parameters
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var items: Items
@@ -36,8 +39,12 @@ class ListMovieFragment : Fragment() {
     private var selectedPosition: Int = -1
     lateinit var host: Host
 
+    private lateinit var mainModel: MainViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
+        mainModel.currFragment = "list"
         arguments?.let {
             items = Items(it.getBundle(ITEMS) as Bundle)
         }
@@ -53,7 +60,6 @@ class ListMovieFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_list_movie, container, false)
         view.findViewById<RecyclerView>(R.id.recycler_view)
         initRecycler(view)
@@ -61,15 +67,6 @@ class ListMovieFragment : Fragment() {
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ListMovieFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: Bundle, fav: ArrayList<Int>) =
             ListMovieFragment().apply {
@@ -81,10 +78,7 @@ class ListMovieFragment : Fragment() {
     }
 
     private fun initRecycler(view: View){
-        val layoutManager = if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) GridLayoutManager(
-            view.context, 2) else LinearLayoutManager(view.context)
         recyclerView = view.findViewById(R.id.recycler_view)
-        recyclerView.layoutManager = layoutManager
         recyclerView.adapter = NewItemsAdapter(items.list, object: NewItemsAdapter.DetailClickListener
         {
             override fun onDetailClick(newsItem: NewItem, position: Int) {

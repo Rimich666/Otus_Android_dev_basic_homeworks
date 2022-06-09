@@ -1,14 +1,18 @@
 package com.example.helloworld
 
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.JsonReader
 import android.util.JsonToken
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.startActivity
 import com.example.helloworld.database.DbObject
 import com.example.helloworld.database.Film
@@ -16,8 +20,10 @@ import com.example.helloworld.database.FilmDb
 import com.example.helloworld.retrofit.ApiService
 import com.example.helloworld.retrofit.RetrofiBuilder
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import okhttp3.*
 import retrofit2.Retrofit
 import java.io.IOException
@@ -29,6 +35,11 @@ class MainActivity : AppCompatActivity() {
     private var okHttpClient: OkHttpClient = OkHttpClient()
     private var items: List<NewItem> = mutableListOf()
     private var db: FilmDb? = null
+    private lateinit var txt: TextView
+    private lateinit var prgBar: ProgressBar
+    private lateinit var rndPrg: ProgressBar
+    private var j =0
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -37,13 +48,74 @@ class MainActivity : AppCompatActivity() {
         val btnAppDb = findViewById<Button>(R.id.button_app_db)
         val btnDrop = findViewById<Button>(R.id.button_destroy_db)
         val btnRetro = findViewById<Button>(R.id.button_retrofit)
+        val btnCor = findViewById<Button>(R.id.button_coroutines)
+        txt = findViewById<TextView>(R.id.textView)
+        prgBar = findViewById(R.id.progress)
+        rndPrg = findViewById(R.id.round_progress)
+        prgBar.min = 0
+        prgBar.max = 200
+
         items = fillList()
         //btn.setOnClickListener{ setImage() }
         btn.setOnClickListener{ Clickfun_1() }
         btn2.setOnClickListener{ request() }
         btnAppDb.setOnClickListener{ appDb() }
         btnDrop.setOnClickListener{ dropDb() }
-        btnRetro.setOnClickListener{ retrofit()}
+        btnRetro.setOnClickListener{ retrofit() }
+        btnCor.setOnClickListener{ coroutines() }
+
+    }
+
+    private fun coroutines(){
+        j = 0
+        rndPrg.visibility = View.VISIBLE
+        GlobalScope.launch(Dispatchers.Default){
+            startCoroutines{
+                    i-> withContext(Dispatchers.Main){
+                updateResults(i)
+                }
+            }
+        }
+    }
+
+    private fun updateResults(i: Int){
+
+        j += i
+        txt.text = j.toString()
+        prgBar.progress = j
+        if(j==200) rndPrg.visibility = View.INVISIBLE
+        Log.d("coroutines", j.toString())
+    }
+
+    private suspend fun startCoroutines(updateResults: suspend (i: Int) -> Unit
+    ) = coroutineScope {
+        val channel = Channel<Int>()
+        launch {
+            coroutineOne(channel)
+        }
+        launch {
+            coroutineTwo(channel)
+        }
+
+        repeat(200){
+            val i = channel.receive()
+            updateResults(1)
+
+        }
+    }
+
+    private suspend fun coroutineOne(channel: Channel<Int>){
+        for(i in 1..100){
+            delay(800L)
+            channel.send(i)
+        }
+    }
+
+    private suspend fun coroutineTwo(channel: Channel<Int>){
+        for(i in 101..200){
+            delay(1000L)
+            channel.send(1)
+        }
     }
 
     private fun retrofit() {
