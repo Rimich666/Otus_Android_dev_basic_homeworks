@@ -1,7 +1,5 @@
 package com.moviesearch.datasource.remotedata
 
-import android.content.Context
-import android.telecom.Call
 import android.util.JsonReader
 import android.util.JsonToken
 import android.util.Log
@@ -12,80 +10,63 @@ import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.io.IOException
 import java.io.StringReader
-import com.moviesearch.App
-import com.moviesearch.datasource.database.DbObject
-import com.moviesearch.datasource.database.DbObject.getDatabase
-import com.moviesearch.datasource.database.FilmDb
-import com.moviesearch.datasource.remotedata.LoadData.limit
-import com.moviesearch.datasource.remotedata.LoadData.page
-import com.moviesearch.datasource.remotedata.LoadData.token
-import java.util.concurrent.Executors
+import com.moviesearch.App.Companion.db
+import com.moviesearch.datasource.database.Page
+import com.moviesearch.trace
+import java.lang.Exception
 
 object LoadData {
     private var okHttpClient: OkHttpClient = OkHttpClient()
     private val URL = "https://api.kinopoisk.dev/movie"
-    private var page: Int = 2
-    private var pagesCount: Int = 1
     private val token = "MKRJKN4-Q0B463J-J85RBPK-ENWYABY"
     private var limit = 50
+    var pagesCount = 0
 
-    private var db: FilmDb? = null
-    fun initBase(progress: (String) -> Unit){
-        Executors.newSingleThreadExecutor().execute(
-            Runnable{
-                Log.d("TraceOfBase", "Собираюсь запросить базу")
-                db = App.getDatabase()
-                Log.d("TraceOfBase", "И что собсно получил? ${db.toString()}")
-
-            }
-        )
-        GlobalScope.launch(Dispatchers.IO){
-            startCoroutines{
-                msg->withContext(Dispatchers.Main){
-                progress(msg)
-                }
-            }
-        }
-
-        progress("Привет из Load data")
-    }
-    private suspend fun startCoroutines(updateResults: suspend (msg: String) -> Unit
+    suspend fun loadPages(pages: List<Int>, currPage: Int, updateResults: suspend (msg: Map<String,*>) -> Unit
     ) = coroutineScope {
-        val channel = Channel<Int>()
-        launch {
-            coroutineOne(channel)
-        }
-        launch {
-            coroutineTwo(channel)
+        val recC = pages.size * limit
+        var i = 0
+
+        //val chProgress = Channel<Int>()
+        val chProgress = Channel<MutableMap<String, Any>?>()
+        updateResults(mapOf("max" to recC, "progress" to 0, "complete" to false))
+
+        for (page in pages) {
+            launch {
+                val json: String = request(mapOf("page" to page.toString(), "limit" to limit.toString()))
+                pagesCount = toBase(json, chProgress, page, page == currPage)
+            }
         }
 
-        repeat(200){
-            val i = channel.receive()
-            updateResults("шаг $i")
-
+        repeat(recC){
+            val item = chProgress.receive()
+            i ++
+            updateResults(mapOf("progress" to i, "complete" to false))
+            if(item!=null) updateResults(mapOf("item" to item, "complete" to false))
         }
+        updateResults(mapOf("complete" to true))
     }
 
-    private suspend fun coroutineOne(channel: Channel<Int>){
-        val json: String = request()
-        Log.d("response", "-----------request всё")
-        toBase(json, channel)
-
+    suspend fun getDetail(id: Int, updateResults: suspend (msg: String) -> Unit
+    ) = coroutineScope{
+        val json: Deferred<String> =
+        async { request(mapOf("search" to mapOf<String, String>("id" to id.toString()))) }
+        updateResults(json.await())
     }
 
-    private suspend fun coroutineTwo(channel: Channel<Int>){
-        for(i in 101..150){
-            delay(15L)
-            channel.send(i)
-        }
-    }
-
-    private fun request():String {
+    private fun request(pars:Map<String,*>):String {
         val urlBuilder: HttpUrl.Builder =
             URL.toHttpUrlOrNull()?.newBuilder() ?: error("URL не удался")
         urlBuilder.addQueryParameter("token", token)
-        urlBuilder.addQueryParameter("page", page.toString())
-        urlBuilder.addQueryParameter("limit", limit.toString())
+        pars.forEach{
+            key, value -> if(key == "search") {
+                Log.d("request", "${trace()} Это всё таки мап: ${value is Map<*, *>}")
+                val search = value as Map<*,*>
+                search.forEach{k, v -> urlBuilder.addQueryParameter("search", v.toString())
+                    urlBuilder.addQueryParameter("field", k.toString())}
+            }
+                else urlBuilder.addQueryParameter(key, value.toString())
+        }
         val url: String = urlBuilder.build().toString()
         val request: Request = Request.Builder().url(url).build()
 
@@ -94,6 +75,7 @@ object LoadData {
             return response.body!!.string()
         }
     }
+
     private val itemMap: MutableMap<String, Any> = mutableMapOf(
         "id" to 0,
         "name" to "",
@@ -102,36 +84,42 @@ object LoadData {
         "poster" to "",
         "previewUrl" to "")
 
-    private suspend fun toBase(json:String, channel:Channel<Int>){
-
-
+    private suspend fun toBase(json:String,
+                               channel:Channel<MutableMap<String,Any>?>,
+                               page: Int,
+                               needRes: Boolean
+                               ): Int{
         val reader = JsonReader(StringReader(json))
         var nm: String
-//        Log.d("response", json)
-//        Log.d("response", "-----------to Base start")
+        var film: Film
+        var pageId: Long = 0
+        var pc = 0
         reader.beginObject()
         while (reader.hasNext()) {
             nm = reader.nextName()
-            if (nm == "docs") {
-                var i = 0
-                reader.beginArray()
-                while (reader.hasNext()) {
-                    readObject(reader)
-                    Log.d("film_add", itemMap.toString())
+            when(nm){
+                "docs" ->{
+                    reader.beginArray()
+                    if (reader.peek()!=JsonToken.END_ARRAY) pageId = db?.filmDao()?.insertPage(Page(page)) as Long
+                    while (reader.hasNext()) {
+                        readObject(reader)
 
-                    //db = mApp.getDatabase()
-                    //Log.d("TraceOfBase", "И что получил? ${db.toString()}")
-                    db?.filmDao()?.insert(Film(itemMap))
-                    channel.send(++i)
+                        film = Film(itemMap, pageId)
+                        db?.filmDao()?.insertFilm(film)
+                        if(needRes) channel.send(itemMap)
+                        else channel.send(null)
+                        itemMap.forEach{ (key, value) -> if(value is Int) itemMap[key] = 0 else itemMap[key] = ""}
+                    }
+                    reader.endArray()
+                    }
+                "pages" -> pc = reader.nextInt()
 
-                }
-                reader.endArray()
-            }
-            else{
-                Log.d("response", "$nm : ${reader.nextInt()}")
+                else -> Log.d("response", "$nm : ${reader.nextInt()}")
+
             }
         }
         reader.endObject()
+        return pc
     }
 
     private fun readObject(reader: JsonReader){
@@ -156,5 +144,8 @@ object LoadData {
         }
         reader.endObject()
     }
+
+
+
 }
 

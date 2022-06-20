@@ -1,18 +1,25 @@
 package com.moviesearch.UI.list
 
+import android.app.Activity
 import android.os.Build
+import android.util.Log
+import android.view.LayoutInflater
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.databinding.DataBindingUtil
+import com.bumptech.glide.Glide
 import com.moviesearch.UI.NewItem
 import com.moviesearch.R
+import com.moviesearch.databinding.NewItemBinding
+import com.moviesearch.trace
 
 
-class NewItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
-    private val imageView: ImageView = itemView.findViewById(R.id.image)
+class NewItemsViewHolder(private val binding: NewItemBinding) : RecyclerView.ViewHolder(binding.root){
+
     private val nameTV: TextView = itemView.findViewById(R.id.textName)
     private val descriptorTV: TextView = itemView.findViewById(R.id.text_short_description)
     private val detailBtn: Button = itemView.findViewById(R.id.button_detail)
@@ -21,7 +28,7 @@ class NewItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
     fun bind(item: NewItem, listener: NewItemsAdapter.DetailClickListener){
         nameTV.text = item.name
         descriptorTV.text = item.description
-        val cont = imageView.context
+        val cont = binding.image.context
         var back_color = cont.resources.getColor(R.color.white, cont.theme)
         var font_color = cont.resources.getColor(R.color.black, cont.theme)
         if(item.Selected)
@@ -33,8 +40,10 @@ class NewItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         itemView.setBackgroundColor(back_color)
         nameTV.setTextColor(font_color)
 
-        val resId: Int = cont.resources.getIdentifier(item.pictures, "drawable", cont.packageName)
-        imageView.setImageResource(resId)
+        Glide.with(cont)
+            .load(item.pictures)
+            .into(binding.image)
+
         detailBtn.setOnClickListener{(listener.onDetailClick(item, absoluteAdapterPosition))}
         itemView.setOnLongClickListener{(listener.onItemLongClick(item, absoluteAdapterPosition))}
         heartIm.setOnClickListener{(listener.onHeartClick(item, absoluteAdapterPosition))}

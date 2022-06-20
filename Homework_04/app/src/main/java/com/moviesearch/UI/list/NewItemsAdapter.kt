@@ -5,17 +5,22 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import com.moviesearch.UI.NewItem
 import com.moviesearch.R
+import com.moviesearch.databinding.NewItemBinding
 
 class NewItemsAdapter (
-    private  val items: List<NewItem>,
+    private val items: List<NewItem>,
     private val listener: DetailClickListener
     ): RecyclerView.Adapter<RecyclerView.ViewHolder>()
     {
+        lateinit var binding: NewItemBinding
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             val inflater = LayoutInflater.from(parent.context)
-            return NewItemsViewHolder(inflater.inflate(R.layout.new_item, parent, false))
+            binding = DataBindingUtil.inflate(inflater, R.layout.new_item, parent, false)
+            return NewItemsViewHolder(binding)
         }
 
         @RequiresApi(Build.VERSION_CODES.M)
