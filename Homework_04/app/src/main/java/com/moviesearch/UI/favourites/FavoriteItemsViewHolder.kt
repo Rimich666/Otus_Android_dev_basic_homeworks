@@ -1,23 +1,19 @@
 package com.moviesearch.UI.favourites
 
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.moviesearch.UI.NewItem
-import com.moviesearch.R
+import com.moviesearch.databinding.FavItemBinding
 
-class FavoriteItemsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    private val imageView: ImageView = itemView.findViewById(R.id.image_fav)
-    private val nameTV: TextView = itemView.findViewById(R.id.textName_fav)
-    private val descriptorTV: TextView = itemView.findViewById(R.id.text_short_description_fav)
-    private val heartIm: ImageView = itemView.findViewById(R.id.heart_image_fav)
+class FavoriteItemsViewHolder(private val binding: FavItemBinding) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: NewItem, listener: FavoriteItemsAdapter.FavoritesClickListener){
-        nameTV.text = item.name
-        descriptorTV.text = item.description
-        val cont = imageView.context
-        val resId: Int = cont.resources.getIdentifier(item.pictures, "drawable", cont.packageName)
-        imageView.setImageResource(resId)
-        heartIm.setOnClickListener{(listener.onHeartClick(item, absoluteAdapterPosition))}
+        binding.textNameFav.text = item.name
+        binding.textShortDescriptionFav.text = item.description
+        val cont = binding.imageFav.context
+        binding.heartImageFav.setOnClickListener{(listener.onHeartClick(item, absoluteAdapterPosition))}
+
+        Glide.with(cont)
+            .load(item.pictures)
+            .into(binding.imageFav)
     }
 }

@@ -21,13 +21,12 @@ import com.moviesearch.trace
 class NewItemsViewHolder(private val binding: NewItemBinding) : RecyclerView.ViewHolder(binding.root){
 
     private val nameTV: TextView = itemView.findViewById(R.id.textName)
-    private val descriptorTV: TextView = itemView.findViewById(R.id.text_short_description)
     private val detailBtn: Button = itemView.findViewById(R.id.button_detail)
     private val heartIm: ImageView = itemView.findViewById(R.id.heart_image)
     @RequiresApi(Build.VERSION_CODES.M)
     fun bind(item: NewItem, listener: NewItemsAdapter.DetailClickListener){
-        nameTV.text = item.name
-        descriptorTV.text = item.description
+        binding.textName.text = item.name
+        binding.textShortDescription.text = item.description
         val cont = binding.image.context
         var back_color = cont.resources.getColor(R.color.white, cont.theme)
         var font_color = cont.resources.getColor(R.color.black, cont.theme)
@@ -38,7 +37,7 @@ class NewItemsViewHolder(private val binding: NewItemBinding) : RecyclerView.Vie
         if(item.liked){iconFav = (cont.resources.getIdentifier("favourite_color","drawable",cont.packageName))}
         heartIm.setImageResource(iconFav)
         itemView.setBackgroundColor(back_color)
-        nameTV.setTextColor(font_color)
+        binding.textName.setTextColor(font_color)
 
         Glide.with(cont)
             .load(item.pictures)

@@ -48,12 +48,11 @@ class FavouritesFragment : Fragment() {
 
 
     private fun initRecycler(){
-        val rWF = binding.recyclerFavor
-        rWF.adapter = FavoriteItemsAdapter(favourites, object: FavoriteItemsAdapter.FavoritesClickListener
+        binding.recyclerFavor.adapter = FavoriteItemsAdapter(favourites, object: FavoriteItemsAdapter.FavoritesClickListener
         {
             override fun onHeartClick(item: NewItem, position: Int) {
-                host.dislike(item)
-                rWF.adapter?.notifyItemRemoved(position)
+                host.dislike(item, position)
+//                rWF.adapter?.notifyItemRemoved(position)
             }
         } )
     }
@@ -64,6 +63,6 @@ class FavouritesFragment : Fragment() {
     }
 
     interface Host{
-        fun dislike(item: NewItem)
+        fun dislike(item: NewItem, pos: Int)
     }
 }

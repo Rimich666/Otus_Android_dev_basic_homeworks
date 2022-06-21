@@ -128,8 +128,8 @@ class MainActivity : AppCompatActivity(),
 
     }
 
-    override fun dislike(item: NewItem){
-        //scope.launch { changeLiked(false, item) }
+    override fun dislike(item: NewItem, pos: Int){
+        scope.launch { viewModel.dislike(item, pos) }
     }
 
     override fun likedItem(item: NewItem, position: Int) {
