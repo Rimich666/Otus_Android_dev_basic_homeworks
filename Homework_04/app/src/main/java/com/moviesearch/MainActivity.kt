@@ -4,11 +4,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.DataBindingUtil.setContentView
 import androidx.lifecycle.ViewModelProvider
 
 
@@ -23,15 +21,11 @@ import com.moviesearch.databinding.ActivityMainBinding
 import com.moviesearch.repository.Repository
 import com.moviesearch.viewmodel.MainViewModel
 import com.moviesearch.viewmodel.MainViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 
 class MainActivity : AppCompatActivity(),
-    ListMovieFragment.Host {
-
-    private var favourites: ArrayList<Int> = arrayListOf()
+    ListMovieFragment.Host, FavouritesFragment.Host {
 
     private lateinit var items: MutableList<NewItem>
     private lateinit var viewModel: MainViewModel
@@ -53,6 +47,7 @@ class MainActivity : AppCompatActivity(),
         viewModelFactory = MainViewModelFactory(setings)
         viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
         items = viewModel.items.value!!
+        viewModel.forCancel.observe(this){ showCancel() }
 
         Log.d("MainActivity.OnCreate", "${viewModel.firstStart}")
         if (viewModel.firstStart){
@@ -87,7 +82,7 @@ class MainActivity : AppCompatActivity(),
 
     private val inflateFragment: MutableMap<String, ()->Any> = mutableMapOf(
         "start" to {supportFragmentManager.beginTransaction()
-            .replace(R.id.container, StartFragment.newInstance("1","2"))
+            .replace(R.id.container, StartFragment.newInstance())
             .commit()},
         "list" to {supportFragmentManager.beginTransaction()
                     .replace(R.id.container, ListMovieFragment.newInstance())
@@ -123,40 +118,47 @@ class MainActivity : AppCompatActivity(),
         AlertDialog.Builder(this)
             .setTitle("Предупреждение")
             .setMessage("Вы действительно хотите выйти из приложения?")
-            .setPositiveButton("Да") { dialog, which ->
+            .setPositiveButton("Да") { _, _ ->
                 super.onBackPressed()
             }
-            .setNegativeButton("Нет") { dialog, which ->
+            .setNegativeButton("Нет") { _, _ ->
                 Toast.makeText(applicationContext, "Ну ладно", Toast.LENGTH_LONG).show()
             }
             .show()
 
     }
 
-    override fun likedItem(position: Int, liked: Boolean, item: NewItem) {
-        changeLiked(position, liked, item,"list")
+    override fun dislike(item: NewItem){
+        //scope.launch { changeLiked(false, item) }
     }
 
-    private fun changeLiked(pos: Int, liked: Boolean, item: NewItem, frg: String){
-        Log.d("changeLiked", "${trace()} Ну таг всё сказал: это чейнж лайкед")
-        //removeOrAddFavour(pos, liked, item)
-        scope.launch{ viewModel.removeOrAddFavour(pos, liked, item) }
-        val map = mapOf<Boolean, String>(true to "добавили", false to "удалили")
+    override fun likedItem(item: NewItem, position: Int) {
+        scope.launch { viewModel.removeOrAddFavour(item, position) }
+    }
+
+    private fun showCancel(){
+        val liked = viewModel.forCancel.value?.liked
+        val map = mapOf(true to "добавили", false to "удалили")
         val zakus = Snackbar.make(
             findViewById(R.id.container),
-            "Вы успешно ${map[liked]} фильм: ${items[pos].name}",
-            Snackbar.LENGTH_LONG)
-        zakus.setAction("Отменить", View.OnClickListener {
-            removeOrAddFavour(pos, !liked)
-            inflateFragment[frg]?.let { it() }})
+            "Вы успешно ${map[liked]} фильм: ${viewModel.forCancel.value?.name}",
+            Snackbar.LENGTH_LONG
+        )
+        zakus.setAction("Отменить") {
+            Log.d("changeLiked","${trace()} сдушалка")
+            //inflateFragment[viewModel.currFragment]?.let { it() }
+        }
         zakus.show()
     }
 
-    /*private fun removeOrAddFavour(pos: Int, liked: Boolean, item: NewItem){
+    /*private suspend fun changeLiked(liked: Boolean, item: NewItem){
+        Log.d("changeLiked", "${trace()} Ну таг всё сказал: это чейнж лайкед")
+        viewModel.removeOrAddFavour(item, 0) { res ->
+            Log.d("changeLiked","${trace()} result = $res")
+            if(res){
 
-
-        items[pos].liked = liked
-        if (liked){favourites.add(pos)}
-        else{ favourites.remove(pos)}
-    }*/
+            }
+        }*/
+    //}
 }
+

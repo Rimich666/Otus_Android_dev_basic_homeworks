@@ -2,6 +2,7 @@ package com.moviesearch.UI
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import com.moviesearch.datasource.database.Favourite
 
 data class NewItem(
     val idKp: Int,
@@ -32,4 +33,15 @@ data class NewItem(
         itemMap["poster"] as String,
         false,
         false)
+
+    constructor(rec: Favourite): this(
+        rec.idKp,
+        rec.name,
+        rec.alternativeName,
+        rec.shortDescription,
+        rec.previewUrl,
+        "",
+        false,
+        true
+    )
 }

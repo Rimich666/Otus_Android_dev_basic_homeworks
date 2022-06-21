@@ -1,13 +1,15 @@
 package com.moviesearch.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.moviesearch.UI.NewItem
+import com.moviesearch.datasource.database.Favourite
 import com.moviesearch.repository.Repository
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import com.moviesearch.trace
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
 
 class MainViewModel(settings: Map<String, *>): ViewModel() {
@@ -20,36 +22,38 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
     var items: MutableLiveData<MutableList<NewItem>> = MutableLiveData(mutableListOf())
     var favourites: MutableLiveData<MutableList<NewItem>> = MutableLiveData(mutableListOf())
 
-    fun dislike(pos: Int){
-        val itemsL = items.value!!
-        val favour = favourites.value!!
-        val item = favour[pos]
-        val itemPos = itemsL.indexOf(item)
-        if (itemPos > -1) itemsL[itemPos].liked = false
-        favour.removeAt(pos)
-    }
+    var changeItem: MutableLiveData<Int> = MutableLiveData(-1)
+    var insertFavourite: MutableLiveData<Int> = MutableLiveData(-1)
+    var removeFavourite: MutableLiveData<Int> = MutableLiveData(-1)
+    var forCancel: MutableLiveData<NewItem> = MutableLiveData()
 
     suspend fun initData(prog: (complete: Boolean)->Unit){
-        Repository().initData{msg ->
+        Repository().initData {msg ->
             if (msg.containsKey("max")) maxProgress.value = msg["max"] as Int
             if (msg.containsKey("progress")) progress.value = msg["progress"] as Int
             if (msg.containsKey(("complete"))) prog(msg["complete"] as Boolean)
             if (msg.containsKey("item")) items.value?.add(NewItem(msg["item"] as MutableMap<*, *>))
+            if (msg.containsKey("favour")) setFavour(msg["favour"] as MutableList<Favourite>)
         }
     }
 
-    suspend fun removeOrAddFavour(pos: Int, liked: Boolean, item: NewItem){
+    private fun setFavour(fav: MutableList<Favourite>){
+        fav.forEach{favourites.value?.add(NewItem(it))}
+    }
+
+    suspend fun removeOrAddFavour(item: NewItem, pos: Int){
+        Log.d("changeLiked", "${trace()} remove or add favourite")
+        val liked = !item.liked
         val result: Boolean =
         if (liked) Repository().like(item)
         else Repository().dislike(item)
-    }
-
-
-    fun changeFavourites(item: NewItem, pos: Int){
-        val favour = favourites.value!!
-        if (item.liked){ favour.removeAt(pos) }
-        else{favour.add(item)}
-        item.liked = !item.liked
+        if (result) {
+            item.liked = liked
+            if (liked) favourites.value?.add(item)
+            else favourites.value?.remove(item)
+            withContext(Dispatchers.Main){changeItem.value = pos}
+            withContext(Dispatchers.Main){forCancel.value = item}
+        }
     }
 }
 

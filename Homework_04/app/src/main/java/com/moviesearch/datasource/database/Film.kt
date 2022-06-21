@@ -15,7 +15,7 @@ data class Film(
     @ColumnInfo(name = "id_kp") val idKp: Int,
     @ColumnInfo(name = "short_description") val shortDescription: String,
     @ColumnInfo(name = "preview_url") val previewUrl: String,
-    @ColumnInfo(name = "alternativeName") val previewLocal: String,
+    @ColumnInfo(name = "alternativeName") val alternativeName: String,
     @ColumnInfo(name = "page_id") val page: Long
 ) {
     @PrimaryKey(autoGenerate = true)
@@ -39,7 +39,7 @@ data class Favourite(
     @ColumnInfo(name = "id_kp") val idKp: Int,
     @ColumnInfo(name = "short_description") val shortDescription: String,
     @ColumnInfo(name = "preview_url") val previewUrl: String,
-    @ColumnInfo(name = "alternativeName") val previewLocal: String
+    @ColumnInfo(name = "alternativeName") val alternativeName: String
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
