@@ -27,6 +27,7 @@ class FavouritesFragment : Fragment() {
         mainModel.currFragment = "favr"
         favourites = mainModel.favourites.value!!
         mainModel.removeFavourite.observe(this){binding.recyclerFavor.adapter?.notifyItemRemoved(it)}
+        mainModel.insertFavourite.observe(this){binding.recyclerFavor.adapter?.notifyItemInserted(it)}
 //        items = mainModel.items.value!!
 
     }

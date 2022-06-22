@@ -136,6 +136,10 @@ class MainActivity : AppCompatActivity(),
         scope.launch { viewModel.removeOrAddFavour(item, position) }
     }
 
+    private fun cancelLiked(){
+        scope.launch { viewModel.cancelLiked() }
+    }
+
     private fun showCancel(){
         val liked = viewModel.forCancel.value?.liked
         val map = mapOf(true to "добавили", false to "удалили")
@@ -144,21 +148,8 @@ class MainActivity : AppCompatActivity(),
             "Вы успешно ${map[liked]} фильм: ${viewModel.forCancel.value?.name}",
             Snackbar.LENGTH_LONG
         )
-        zakus.setAction("Отменить") {
-            Log.d("changeLiked","${trace()} сдушалка")
-            //inflateFragment[viewModel.currFragment]?.let { it() }
-        }
+        zakus.setAction("Отменить") { cancelLiked() }
         zakus.show()
     }
-
-    /*private suspend fun changeLiked(liked: Boolean, item: NewItem){
-        Log.d("changeLiked", "${trace()} Ну таг всё сказал: это чейнж лайкед")
-        viewModel.removeOrAddFavour(item, 0) { res ->
-            Log.d("changeLiked","${trace()} result = $res")
-            if(res){
-
-            }
-        }*/
-    //}
 }
 

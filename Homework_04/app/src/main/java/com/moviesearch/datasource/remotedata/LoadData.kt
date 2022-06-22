@@ -29,7 +29,7 @@ object LoadData {
 
         //val chProgress = Channel<Int>()
         val chProgress = Channel<MutableMap<String, Any>?>()
-        updateResults(mapOf("max" to recC, "progress" to 0, "complete" to false))
+        updateResults(mapOf("max" to recC, "progress" to 0))//, "complete" to false))
 
         for (page in pages) {
             launch {
@@ -41,8 +41,8 @@ object LoadData {
         repeat(recC){
             val item = chProgress.receive()
             i ++
-            updateResults(mapOf("progress" to i, "complete" to false))
-            updateResults(mapOf("item" to item, "complete" to false))
+            updateResults(mapOf("progress" to i))//, "complete" to false))
+            updateResults(mapOf("item" to item))//, "complete" to false))
         }
         updateResults(mapOf("complete" to true))
     }

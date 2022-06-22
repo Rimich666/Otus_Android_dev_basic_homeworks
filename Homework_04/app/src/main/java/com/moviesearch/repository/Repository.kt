@@ -1,11 +1,13 @@
 package com.moviesearch.repository
 
+import android.util.Log
 import com.moviesearch.App.Companion.db
 import com.moviesearch.UI.NewItem
 import com.moviesearch.datasource.database.Favourite
 import com.moviesearch.datasource.database.QueryDb.insertFilm
 import com.moviesearch.datasource.database.QueryDb.isLiked
 import com.moviesearch.datasource.remotedata.LoadData
+import com.moviesearch.trace
 import kotlinx.coroutines.*
 
 class Repository {
@@ -34,12 +36,10 @@ class Repository {
                                 item["id"] as Int
                             )
                         }
-                    if (ins.await()){
+                    if (ins.await() && isView){
                         item["liked"] = liked
-
+                        withContext(Dispatchers.Main){progress(mutableMapOf("item" to item))}
                     }
-
-                    withContext(Dispatchers.Main){progress(msg)}
                 }
                 else withContext(Dispatchers.Main){progress(msg)}
             }
@@ -60,12 +60,13 @@ class Repository {
 
     suspend fun dislike(item: NewItem):Boolean = coroutineScope{
         val res: Deferred<Int?> = async { db?.filmDao()?.deleteFavouriteIdKp(item.idKp) }
-        return@coroutineScope res.await()!! > 0
+        return@coroutineScope res.await()!! > 0L
     }
 
     suspend fun like(item: NewItem): Boolean = coroutineScope{
+        Log.d("cancelLiked", "${trace()} item = ${item.pictures}")
         val res: Deferred<Long?> = async { db?.filmDao()?.insertFavourite(Favourite(item)) }
-        return@coroutineScope res.await()!=null
+        return@coroutineScope res.await()!=0L
     }
 
 }
