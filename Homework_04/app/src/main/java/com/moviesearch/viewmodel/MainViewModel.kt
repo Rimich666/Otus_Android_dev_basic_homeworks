@@ -41,20 +41,25 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
         fav.forEach{favourites.value?.add(NewItem(it))}
     }
 
+
+
     suspend fun dislike(itemFav: NewItem, posFav: Int){
-        val pos = items.value?.indexOfFirst { it.idKp == itemFav.idKp }
+        val itemsLoc = items.value!!
+        val pos = itemsLoc.indexOfFirst { it.idKp == itemFav.idKp }!!
         val result: Boolean = Repository().dislike(itemFav)
         if (result) {
-
-            item.liked = liked
-            if (liked) favourites.value?.add(item)
-            else favourites.value?.remove(item)
-            withContext(Dispatchers.Main){changeItem.value = pos}
-            withContext(Dispatchers.Main){forCancel.value = item}
+            if (pos > -1) {
+                itemsLoc[pos].liked = false
+                withContext(Dispatchers.Main){changeItem.value = pos}
+            }
+            favourites.value?.remove(itemFav)
+            withContext(Dispatchers.Main){
+                removeFavourite.value = posFav
+                forCancel.value = itemFav
+            }
         }
-
-        Log.d("dislike", "${trace()} position = $pos")
     }
+
 
     suspend fun removeOrAddFavour(item: NewItem, pos: Int){
         Log.d("changeLiked", "${trace()} remove or add favourite")

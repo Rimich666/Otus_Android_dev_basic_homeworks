@@ -26,6 +26,7 @@ class FavouritesFragment : Fragment() {
         mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         mainModel.currFragment = "favr"
         favourites = mainModel.favourites.value!!
+        mainModel.removeFavourite.observe(this){binding.recyclerFavor.adapter?.notifyItemRemoved(it)}
 //        items = mainModel.items.value!!
 
     }

@@ -3,7 +3,8 @@ package com.moviesearch.repository
 import com.moviesearch.App.Companion.db
 import com.moviesearch.UI.NewItem
 import com.moviesearch.datasource.database.Favourite
-import com.moviesearch.datasource.database.Film
+import com.moviesearch.datasource.database.QueryDb.insertFilm
+import com.moviesearch.datasource.database.QueryDb.isLiked
 import com.moviesearch.datasource.remotedata.LoadData
 import kotlinx.coroutines.*
 
@@ -22,9 +23,25 @@ class Repository {
     suspend fun initData(progress: (msg: Map<String,*>)->Unit) = coroutineScope{
         launch(Dispatchers.IO) {
             LoadData.loadPages(pages, currentPage) { msg ->
-                withContext(Dispatchers.Main) {
-                    progress(msg)
+                if (msg.containsKey("item")){
+                    val item = msg["item"] as MutableMap<String, Any>
+                    val isView = item["page"] as Int == currentPage
+                    val ins: Deferred<Boolean> = async { insertFilm(item) }
+                    val liked: Boolean =
+                        withContext(Dispatchers.Default) {
+                            isLiked(
+                                isView,
+                                item["id"] as Int
+                            )
+                        }
+                    if (ins.await()){
+                        item["liked"] = liked
+
+                    }
+
+                    withContext(Dispatchers.Main){progress(msg)}
                 }
+                else withContext(Dispatchers.Main){progress(msg)}
             }
         }
         val favour: Deferred<MutableList<Favourite>> = async{ db?.filmDao()?.getFavourites()!!}

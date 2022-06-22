@@ -38,7 +38,6 @@ class NewItemsViewHolder(private val binding: NewItemBinding) : RecyclerView.Vie
         heartIm.setImageResource(iconFav)
         itemView.setBackgroundColor(back_color)
         binding.textName.setTextColor(font_color)
-
         Glide.with(cont)
             .load(item.pictures)
             .into(binding.image)

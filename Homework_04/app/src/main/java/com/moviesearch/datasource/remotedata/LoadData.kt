@@ -42,7 +42,7 @@ object LoadData {
             val item = chProgress.receive()
             i ++
             updateResults(mapOf("progress" to i, "complete" to false))
-            if(item!=null) updateResults(mapOf("item" to item, "complete" to false))
+            updateResults(mapOf("item" to item, "complete" to false))
         }
         updateResults(mapOf("complete" to true))
     }
@@ -100,14 +100,15 @@ object LoadData {
             when(nm){
                 "docs" ->{
                     reader.beginArray()
-                    if (reader.peek()!=JsonToken.END_ARRAY) pageId = db?.filmDao()?.insertPage(Page(page)) as Long
+                    //if (reader.peek()!=JsonToken.END_ARRAY) pageId = db?.filmDao()?.insertPage(Page(page)) as Long
                     while (reader.hasNext()) {
                         readObject(reader)
-
-                        film = Film(itemMap, pageId)
-                        db?.filmDao()?.insertFilm(film)
-                        if(needRes) channel.send(itemMap)
-                        else channel.send(null)
+                        itemMap["page"] = page
+                        //film = Film(itemMap, pageId)
+                        //db?.filmDao()?.insertFilm(film)
+                        //if(needRes) channel.send(itemMap)
+                        //else channel.send(null)
+                        channel.send(itemMap)
                         itemMap.forEach{ (key, value) -> if(value is Int) itemMap[key] = 0 else itemMap[key] = ""}
                     }
                     reader.endArray()
@@ -144,8 +145,4 @@ object LoadData {
         }
         reader.endObject()
     }
-
-
-
 }
-
