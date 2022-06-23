@@ -28,4 +28,10 @@ object QueryDb {
         val liked = db?.filmDao()?.getLiked(idKp)
         return liked != 0L
     }
+
+    fun getPage(page: Int): MutableList<Film>? {
+        val pId = db?.filmDao()?.getPage(page)
+        return if (pId == 0L) null
+        else db?.filmDao()?.getPageFilms(pId!!)
+    }
 }

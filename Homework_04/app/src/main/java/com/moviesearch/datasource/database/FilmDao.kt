@@ -22,6 +22,6 @@ interface FilmDao {
     fun getLiked(idKp: Int): Long
 
     @Query("SELECT * FROM list_films WHERE list_films.page_id = :pageId")
-    fun getPageFilms(pageId: Int): MutableList<Film>
+    fun getPageFilms(pageId: Long): MutableList<Film>
 }
 

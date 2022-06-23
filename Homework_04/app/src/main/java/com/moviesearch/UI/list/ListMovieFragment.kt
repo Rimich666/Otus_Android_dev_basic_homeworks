@@ -23,13 +23,15 @@ import com.moviesearch.UI.favourites.FavouritesFragment
 import com.moviesearch.databinding.FragmentListMovieBinding
 import com.moviesearch.trace
 import com.moviesearch.viewmodel.MainViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 class ListMovieFragment : Fragment() {
     private lateinit var RW: RecyclerView
     private lateinit var binding :FragmentListMovieBinding
     private lateinit var items: MutableList<NewItem>
-    lateinit var host: Host
+    lateinit var host: HostList
     private lateinit var mainModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,12 +40,12 @@ class ListMovieFragment : Fragment() {
         mainModel.currFragment = "list"
         items = mainModel.items.value!!
         mainModel.changeItem.observe(this) { binding.recyclerView.adapter?.notifyItemChanged(it) }
-
+        
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        host = context as Host
+        host = context as HostList
     }
 
 
@@ -74,11 +76,19 @@ class ListMovieFragment : Fragment() {
         binding.recyclerView.addOnScrollListener(object :RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
+                if (layoutManager.findLastVisibleItemPosition() == mainModel.items.value?.size!! - 1 && dy > 0 && !mainModel.loading){
+                    Log.d("scrolling", "${trace()} loading: ${mainModel.loading}")
+                    Log.d("scrolling", "${trace()} dx dy: $dx $dy")
+                    Log.d("scrolling", "${trace()} надо грузить next")
+                    mainModel.loading = true
+                    host.getNext()
+                }
+
                 Log.d("scrolling", "${trace()} FirstVisibleItemPosition: ${layoutManager.findFirstVisibleItemPosition()}")
                 Log.d("scrolling", "${trace()} LastVisibleItemPosition: ${layoutManager.findLastVisibleItemPosition()}")
 
 
-                Log.d("scrolling", "${trace()} dx dy: $dx $dy")
+
             }
         })
 
@@ -106,8 +116,9 @@ class ListMovieFragment : Fragment() {
         host.likedItem(pos, !item.liked, item)
     }*/
 
-    interface Host{
+    interface HostList{
         fun showDetail(position: Int)
         fun likedItem(item: NewItem, position: Int)
+        fun getNext()
     }
 }

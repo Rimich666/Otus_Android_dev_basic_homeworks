@@ -25,7 +25,7 @@ import kotlinx.coroutines.*
 
 
 class MainActivity : AppCompatActivity(),
-    ListMovieFragment.Host, FavouritesFragment.Host {
+    ListMovieFragment.HostList, FavouritesFragment.Host {
 
     private lateinit var items: MutableList<NewItem>
     private lateinit var viewModel: MainViewModel
@@ -130,6 +130,10 @@ class MainActivity : AppCompatActivity(),
 
     override fun dislike(item: NewItem, pos: Int){
         scope.launch { viewModel.dislike(item, pos) }
+    }
+
+    override fun getNext(){
+        scope.launch { viewModel.getNext() }
     }
 
     override fun likedItem(item: NewItem, position: Int) {

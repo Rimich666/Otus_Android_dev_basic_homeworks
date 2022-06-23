@@ -4,6 +4,8 @@ import android.util.Log
 import com.moviesearch.App.Companion.db
 import com.moviesearch.UI.NewItem
 import com.moviesearch.datasource.database.Favourite
+import com.moviesearch.datasource.database.Film
+import com.moviesearch.datasource.database.QueryDb
 import com.moviesearch.datasource.database.QueryDb.insertFilm
 import com.moviesearch.datasource.database.QueryDb.isLiked
 import com.moviesearch.datasource.remotedata.LoadData
@@ -11,9 +13,6 @@ import com.moviesearch.trace
 import kotlinx.coroutines.*
 
 class Repository {
-    var currentPage: Int = 1
-    var pages = listOf<Int>(1,2,3)
-
     fun getMovieList(): List<NewItem> {
         return listOf()
     }
@@ -22,7 +21,13 @@ class Repository {
 
     }
 
+    fun getNext(lastPage: Int): MutableList<Film>?{
+        return QueryDb.getPage(lastPage)
+    }
+
     suspend fun initData(progress: (msg: Map<String,*>)->Unit) = coroutineScope{
+        val currentPage: Int = 1
+        val pages = listOf<Int>(1,2,3)
         launch(Dispatchers.IO) {
             LoadData.loadPages(pages, currentPage) { msg ->
                 if (msg.containsKey("item")){

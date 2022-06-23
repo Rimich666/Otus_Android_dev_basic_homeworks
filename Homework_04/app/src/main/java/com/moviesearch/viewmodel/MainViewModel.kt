@@ -27,11 +27,35 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
     var removeFavourite: MutableLiveData<Int> = MutableLiveData(-1)
     var forCancel: MutableLiveData<NewItem> = MutableLiveData()
 
+    var loading: Boolean = false
+
+    private class Page(val first: Int, val last: Int, page: Int, size: Int)
+    private var prevP: Page? = null
+    private var currP: Page? = null
+    private var nextP: Page? = null
+
+    private var lastPage = 1
+    private var firstPage = 1
+
+    suspend fun getNext(){
+        lastPage ++
+        val listPage = Repository().getNext(lastPage)
+        if (nextP != null){
+            nextP = Page(items.value!!.size, items.value!!.size + listPage!!.size - 1, lastPage, listPage.size)
+            items.value!!.addAll(items.value!!.size, listPage as Collection<NewItem>)
+        }
+        else
+            Log.d("paging", "${trace()} Это залёт воин: nextP не null")
+    }
+
     suspend fun initData(prog: (complete: Boolean)->Unit){
         Repository().initData {msg ->
             if (msg.containsKey("max")) maxProgress.value = msg["max"] as Int
             if (msg.containsKey("progress")) progress.value = msg["progress"] as Int
-            if (msg.containsKey(("complete"))) prog(msg["complete"] as Boolean)
+            if (msg.containsKey(("complete"))) {
+                currP = Page(0, items.value?.size!! - 1, 1, items.value?.size!!)
+                prog(msg["complete"] as Boolean)
+            }
             if (msg.containsKey("item")) items.value?.add(NewItem(msg["item"] as MutableMap<*, *>))
             if (msg.containsKey("favour")) setFavour(msg["favour"] as MutableList<Favourite>)
         }
