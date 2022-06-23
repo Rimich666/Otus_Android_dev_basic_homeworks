@@ -26,7 +26,7 @@ import com.moviesearch.viewmodel.MainViewModel
 
 
 class ListMovieFragment : Fragment() {
-
+    private lateinit var RW: RecyclerView
     private lateinit var binding :FragmentListMovieBinding
     private lateinit var items: MutableList<NewItem>
     lateinit var host: Host
@@ -38,6 +38,7 @@ class ListMovieFragment : Fragment() {
         mainModel.currFragment = "list"
         items = mainModel.items.value!!
         mainModel.changeItem.observe(this) { binding.recyclerView.adapter?.notifyItemChanged(it) }
+
     }
 
     override fun onAttach(context: Context) {
@@ -52,6 +53,7 @@ class ListMovieFragment : Fragment() {
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_list_movie, container, false)
         val view = binding.root
+        RW = view.findViewById(R.id.recycler_view)
         initRecycler()
         return view
     }
@@ -61,7 +63,25 @@ class ListMovieFragment : Fragment() {
         fun newInstance() = ListMovieFragment()
     }
 
+
     private fun initRecycler(){
+        val rW = binding.recyclerView
+        val layoutManager = if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+            GridLayoutManager(binding.root.context, 2)
+        else LinearLayoutManager(binding.root.context)
+        rW.layoutManager = layoutManager
+
+        binding.recyclerView.addOnScrollListener(object :RecyclerView.OnScrollListener(){
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                Log.d("scrolling", "${trace()} FirstVisibleItemPosition: ${layoutManager.findFirstVisibleItemPosition()}")
+                Log.d("scrolling", "${trace()} LastVisibleItemPosition: ${layoutManager.findLastVisibleItemPosition()}")
+
+
+                Log.d("scrolling", "${trace()} dx dy: $dx $dy")
+            }
+        })
+
         binding.recyclerView.adapter = NewItemsAdapter(mainModel.items.value as List<NewItem>,
             object: NewItemsAdapter.DetailClickListener
             {

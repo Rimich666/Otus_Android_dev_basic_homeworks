@@ -51,10 +51,12 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
             else Repository().dislike(item)
         Log.d("cancelLiked", "${trace()} result = $result")
         if (result){
-            withContext(Dispatchers.Main){
-                items.value!![changeItem.value!!].liked = liked
-                Log.d("cancelLiked", "${trace()} changeItem = ${changeItem.value}")
-                changeItem.value = changeItem.value
+            if (changeItem.value!! > -1){
+                withContext(Dispatchers.Main){
+                    items.value!![changeItem.value!!].liked = liked
+                    Log.d("cancelLiked", "${trace()} changeItem = ${changeItem.value}")
+                    changeItem.value = changeItem.value
+                }
             }
             if (liked){
                 withContext(Dispatchers.Main){
@@ -78,6 +80,7 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
             }
             withContext(Dispatchers.Main){
                 forCancel.value = itemFav
+                forCancel.value?.liked = false
                 favourites.value?.remove(itemFav)
                 removeFavourite.value = posFav
             }
