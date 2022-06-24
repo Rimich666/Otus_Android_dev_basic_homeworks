@@ -30,6 +30,7 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
     var loading: Boolean = false
     var insertItem: MutableLiveData<Int> = MutableLiveData()
     var deletedItem: MutableLiveData<Int> = MutableLiveData()
+    //var deletedItems: MutableLiveData<Page> = MutableLiveData()
     //var insertPage: MutableLiveData<Page> = MutableLiveData()
 
     class Page(var first: Int, var last: Int, page: Int, val size: Int)
@@ -43,33 +44,49 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
     suspend fun getNext(){
         Log.d("paging", "${trace()} ViewModel.getNext()")
         lastPage ++
+        Log.d("scrolling", "${trace()} lastPage = $lastPage")
         val listPage = Repository().getNext(lastPage)
+        Log.d("scrolling", "${trace()} listPage = $listPage")
+
+        if (nextP != null){
+            deletePage(currP!!)
+        }
+
         if (nextP == null){
+//               nextP = Page(items.value!!.size, items.value!!.size + 50, lastPage, 50)
             nextP = Page(items.value!!.size, items.value!!.size + listPage!!.size - 1, lastPage, listPage.size)
-            listPage.forEach{
-                val flm = it
+            listPage!!.forEach{
+                    val flm = it
                 items.value!!.add(
                     items.value!!.size ,
                     NewItem(flm, favourites.value!!.indexOfFirst {
                         flm.idKp == it.idKp
                     } > 0))
-                withContext(Dispatchers.Main){ insertItem.value = items.value!!.size }
+                withContext(Dispatchers.Main) {insertItem.value = items.value!!.size}
             }
         }
         else
             Log.d("paging", "${trace()} Это залёт воин: nextP не null")
+
+
         loading = false
+        Log.d("scrolling", "${trace()} nextP: $nextP")
     }
 
-    fun deleteNext(){
-        for(i in(0..currP!!.size))
-        items.value!!.removeAt(0)
-        deletedItem.value = 0
+    private suspend fun deletePage(page: Page){
+        withContext(Dispatchers.Main) {
+            for(i in(currP!!.size downTo 0 step 1)){
+                Log.d("scrolling", "${trace()} delete $i")
+                items.value!!.removeAt(i)
+                deletedItem.value = i
+            }
+        }
+        //withContext(Dispatchers.Main) { deletedItems.value = currP }
+        Log.d("scrolling", "${trace()} nextP: $nextP")
         currP = nextP
         currP!!.first = 0
         currP!!.last = currP!!.size - 1
         nextP = null
-        loading = false
     }
 
     suspend fun initData(prog: (complete: Boolean)->Unit){

@@ -45,9 +45,10 @@ class ListMovieFragment : Fragment() {
         mainModel.insertItem.observe(this){
             binding.recyclerView.adapter?.notifyItemInserted(it)
         }
-        /*mainModel.deletedItem.observe(this){
+        mainModel.deletedItem.observe(this){
+            Log.d("scrolling", "${trace()} delete ${it}")
             binding.recyclerView.adapter?.notifyItemRemoved(it)
-        }*/
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -92,26 +93,27 @@ class ListMovieFragment : Fragment() {
                     host.getNext()
                 }
 
-                if (layoutManager.findFirstVisibleItemPosition() > mainModel.currP!!.last
+                /*if (layoutManager.findFirstVisibleItemPosition() > mainModel.currP!!.last
                     && dy > 0
                     && !mainModel.loading){
-                    Log.d("scrolling", "${trace()} FirstVisibleItemPosition: " +
+                    *//*Log.d("scrolling", "${trace()} FirstVisibleItemPosition: " +
                             "${layoutManager.findFirstVisibleItemPosition()}")
                     Log.d("scrolling", "${trace()} LastVisibleItemPosition: " +
                             "${layoutManager.findLastVisibleItemPosition()}")
                     Log.d("scrolling", "${trace()} LastCurr: " +
                             "${mainModel.currP!!.last}")
                     Log.d("scrolling", "${trace()} надо удалить curr")
-                    /*mainModel.loading = true
-                    mainModel.deleteNext()*/
-                }
+                    mainModel.loading = true
+                    mainModel.deleteNext()*//*
+                }*/
 
             }
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 if (newState == 0)
-                    Log.d("scrolling", "${trace()} newState: стоит рециклер}")
+                    Log.d("scrolling", "${trace()} newState: стоит рециклер " +
+                            "${layoutManager.findLastVisibleItemPosition()}")
             }
 
 
