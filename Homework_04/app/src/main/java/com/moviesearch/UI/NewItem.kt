@@ -3,6 +3,7 @@ package com.moviesearch.UI
 import android.os.Bundle
 import androidx.core.os.bundleOf
 import com.moviesearch.datasource.database.Favourite
+import com.moviesearch.datasource.database.Film
 
 data class NewItem(
     val idKp: Int,
@@ -43,5 +44,15 @@ data class NewItem(
         "",
         false,
         true
+    )
+    constructor(rec: Film, liked: Boolean): this(
+        rec.idKp,
+        rec.name,
+        rec.alternativeName,
+        rec.shortDescription,
+        rec.previewUrl,
+        "",
+        false,
+        liked
     )
 }

@@ -28,24 +28,48 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
     var forCancel: MutableLiveData<NewItem> = MutableLiveData()
 
     var loading: Boolean = false
+    var insertItem: MutableLiveData<Int> = MutableLiveData()
+    var deletedItem: MutableLiveData<Int> = MutableLiveData()
+    //var insertPage: MutableLiveData<Page> = MutableLiveData()
 
-    private class Page(val first: Int, val last: Int, page: Int, size: Int)
-    private var prevP: Page? = null
-    private var currP: Page? = null
-    private var nextP: Page? = null
+    class Page(var first: Int, var last: Int, page: Int, val size: Int)
+    var prevP: Page? = null
+    var currP: Page? = null
+    var nextP: Page? = null
 
     private var lastPage = 1
     private var firstPage = 1
 
     suspend fun getNext(){
+        Log.d("paging", "${trace()} ViewModel.getNext()")
         lastPage ++
         val listPage = Repository().getNext(lastPage)
-        if (nextP != null){
+        if (nextP == null){
             nextP = Page(items.value!!.size, items.value!!.size + listPage!!.size - 1, lastPage, listPage.size)
-            items.value!!.addAll(items.value!!.size, listPage as Collection<NewItem>)
+            listPage.forEach{
+                val flm = it
+                items.value!!.add(
+                    items.value!!.size ,
+                    NewItem(flm, favourites.value!!.indexOfFirst {
+                        flm.idKp == it.idKp
+                    } > 0))
+                withContext(Dispatchers.Main){ insertItem.value = items.value!!.size }
+            }
         }
         else
             Log.d("paging", "${trace()} Это залёт воин: nextP не null")
+        loading = false
+    }
+
+    fun deleteNext(){
+        for(i in(0..currP!!.size))
+        items.value!!.removeAt(0)
+        deletedItem.value = 0
+        currP = nextP
+        currP!!.first = 0
+        currP!!.last = currP!!.size - 1
+        nextP = null
+        loading = false
     }
 
     suspend fun initData(prog: (complete: Boolean)->Unit){

@@ -39,8 +39,15 @@ class ListMovieFragment : Fragment() {
         mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         mainModel.currFragment = "list"
         items = mainModel.items.value!!
-        mainModel.changeItem.observe(this) { binding.recyclerView.adapter?.notifyItemChanged(it) }
-        
+        mainModel.changeItem.observe(this){
+            binding.recyclerView.adapter?.notifyItemChanged(it)
+        }
+        mainModel.insertItem.observe(this){
+            binding.recyclerView.adapter?.notifyItemInserted(it)
+        }
+        /*mainModel.deletedItem.observe(this){
+            binding.recyclerView.adapter?.notifyItemRemoved(it)
+        }*/
     }
 
     override fun onAttach(context: Context) {
@@ -72,24 +79,43 @@ class ListMovieFragment : Fragment() {
             GridLayoutManager(binding.root.context, 2)
         else LinearLayoutManager(binding.root.context)
         rW.layoutManager = layoutManager
-
+        //rW.onScrollStateChanged()
         binding.recyclerView.addOnScrollListener(object :RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                if (layoutManager.findLastVisibleItemPosition() == mainModel.items.value?.size!! - 1 && dy > 0 && !mainModel.loading){
-                    Log.d("scrolling", "${trace()} loading: ${mainModel.loading}")
-                    Log.d("scrolling", "${trace()} dx dy: $dx $dy")
+                if (layoutManager.findLastVisibleItemPosition() == mainModel.items.value?.size!! - 1
+                    && dy > 0
+                    && !mainModel.loading){
+                    Log.d("scrolling", "${trace()} last: ${mainModel.items.value?.size!! - 1}")
                     Log.d("scrolling", "${trace()} надо грузить next")
                     mainModel.loading = true
                     host.getNext()
                 }
 
-                Log.d("scrolling", "${trace()} FirstVisibleItemPosition: ${layoutManager.findFirstVisibleItemPosition()}")
-                Log.d("scrolling", "${trace()} LastVisibleItemPosition: ${layoutManager.findLastVisibleItemPosition()}")
-
-
+                if (layoutManager.findFirstVisibleItemPosition() > mainModel.currP!!.last
+                    && dy > 0
+                    && !mainModel.loading){
+                    Log.d("scrolling", "${trace()} FirstVisibleItemPosition: " +
+                            "${layoutManager.findFirstVisibleItemPosition()}")
+                    Log.d("scrolling", "${trace()} LastVisibleItemPosition: " +
+                            "${layoutManager.findLastVisibleItemPosition()}")
+                    Log.d("scrolling", "${trace()} LastCurr: " +
+                            "${mainModel.currP!!.last}")
+                    Log.d("scrolling", "${trace()} надо удалить curr")
+                    /*mainModel.loading = true
+                    mainModel.deleteNext()*/
+                }
 
             }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == 0)
+                    Log.d("scrolling", "${trace()} newState: стоит рециклер}")
+            }
+
+
+
         })
 
         binding.recyclerView.adapter = NewItemsAdapter(mainModel.items.value as List<NewItem>,
