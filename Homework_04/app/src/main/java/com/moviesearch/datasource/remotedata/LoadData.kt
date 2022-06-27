@@ -66,9 +66,11 @@ object LoadData {
     }
 
     private fun request(pars:Map<String,*>):String {
+        Log.d("request", "${trace()} request")
         val urlBuilder: HttpUrl.Builder =
             URL.toHttpUrlOrNull()?.newBuilder() ?: error("URL не удался")
         urlBuilder.addQueryParameter("token", TOKEN)
+
         pars.forEach{ (key, value) -> if(key == "search") {
                 Log.d("request", "${trace()} Это всё таки мап: ${value is Map<*, *>}")
                 val search = value as Map<*,*>
@@ -81,6 +83,7 @@ object LoadData {
         val request: Request = Request.Builder().url(url).build()
 
         okHttpClient.newCall(request).execute().use { response ->
+            Log.d("request", "${trace()} Код респонса: ${response.code} ${response.message}")
             if (!response.isSuccessful) throw IOException("непонятки какие-то $response")
             return response.body!!.string()
         }
