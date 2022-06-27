@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity(),
     private lateinit var viewModel: MainViewModel
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModelFactory: MainViewModelFactory
-    private val repository = Repository()
+    //private val repository = $Repository
     private val scope = CoroutineScope(Dispatchers.Default)
     private var setings: Map<String,*> = mapOf(
         "firstStart" to true,
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity(),
         val item = viewModel.items.value!![position]
         item.Selected = true
         scope.launch {
-            repository.getDetails(item.idKp, tkDet)
+            Repository.getDetails(item.idKp, tkDet)
         }
     }
 
@@ -134,6 +134,10 @@ class MainActivity : AppCompatActivity(),
 
     override fun getNext(){
         scope.launch { viewModel.getNext() }
+    }
+
+    override fun getPrevious(){
+        scope.launch { viewModel.getPrevious() }
     }
 
     override fun likedItem(item: NewItem, position: Int) {

@@ -46,7 +46,6 @@ class ListMovieFragment : Fragment() {
             binding.recyclerView.adapter?.notifyItemInserted(it)
         }
         mainModel.deletedItem.observe(this){
-            Log.d("scrolling", "${trace()} delete ${it}")
             binding.recyclerView.adapter?.notifyItemRemoved(it)
         }
     }
@@ -87,37 +86,22 @@ class ListMovieFragment : Fragment() {
                 if (layoutManager.findLastVisibleItemPosition() == mainModel.items.value?.size!! - 1
                     && dy > 0
                     && !mainModel.loading){
-                    Log.d("scrolling", "${trace()} last: ${mainModel.items.value?.size!! - 1}")
-                    Log.d("scrolling", "${trace()} надо грузить next")
+                    //Log.d("scrolling", "${trace()} last: ${mainModel.items.value?.size!! - 1}")
+                    //Log.d("scrolling", "${trace()} надо грузить next")
                     mainModel.loading = true
                     host.getNext()
                 }
 
-                /*if (layoutManager.findFirstVisibleItemPosition() > mainModel.currP!!.last
-                    && dy > 0
+                if (layoutManager.findFirstVisibleItemPosition() == 0
+                    && dy < 0
                     && !mainModel.loading){
-                    *//*Log.d("scrolling", "${trace()} FirstVisibleItemPosition: " +
-                            "${layoutManager.findFirstVisibleItemPosition()}")
-                    Log.d("scrolling", "${trace()} LastVisibleItemPosition: " +
-                            "${layoutManager.findLastVisibleItemPosition()}")
-                    Log.d("scrolling", "${trace()} LastCurr: " +
-                            "${mainModel.currP!!.last}")
-                    Log.d("scrolling", "${trace()} надо удалить curr")
+                    //Log.d("scrolling", "${trace()} firstPos: ${layoutManager.findFirstVisibleItemPosition()}")
+                    //Log.d("scrolling", "${trace()} надо грузить previos")
                     mainModel.loading = true
-                    mainModel.deleteNext()*//*
-                }*/
+                    host.getPrevious()
+                }
 
             }
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if (newState == 0)
-                    Log.d("scrolling", "${trace()} newState: стоит рециклер " +
-                            "${layoutManager.findLastVisibleItemPosition()}")
-            }
-
-
-
         })
 
         binding.recyclerView.adapter = NewItemsAdapter(mainModel.items.value as List<NewItem>,
@@ -148,5 +132,6 @@ class ListMovieFragment : Fragment() {
         fun showDetail(position: Int)
         fun likedItem(item: NewItem, position: Int)
         fun getNext()
+        fun getPrevious()
     }
 }

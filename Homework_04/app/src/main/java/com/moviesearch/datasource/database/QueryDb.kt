@@ -3,24 +3,45 @@ package com.moviesearch.datasource.database
 import android.util.Log
 import com.moviesearch.App.Companion.db
 import com.moviesearch.trace
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.Channel.Factory.RENDEZVOUS
 
 object QueryDb {
+    suspend fun insertFilms(itemMaps: MutableList<MutableMap<String,Any>>, channel: Channel<Long>?) = coroutineScope{
+        val itemMap = itemMaps[0]
+        val pageId: Deferred<Long> = async {
+            var pId = db!!.filmDao().getPage(itemMap["page"] as Int)
+            if (pId == 0L) pId = db!!.filmDao().insertPage(Page(itemMap["page"] as Int))
+            return@async pId
+        }
+        val idPage = pageId.await()
 
-    private fun insertPage(page: Int): Long{
-        var pId = db?.filmDao()?.getPage(page)
-        if (pId == 0L) pId = db?.filmDao()?.insertPage(Page(page))
-        return pId!!
+        for (i in 1 until itemMaps.size){
+            Log.d("insertFilm", "${trace()} " +
+                    "pageId = $idPage " +
+                    "page[$i] = ${itemMaps[i]["page"]}, " +
+                    "idKp[$i] = ${itemMaps[i]["id"]}")
+            launch { insertFilm(itemMaps[i], idPage, channel) }
+        }
     }
 
-    fun insertFilm(itemMap: MutableMap<String, Any>): Boolean{
-        val pageId = insertPage(itemMap["page"] as Int)
-        var res: Long? = null
-        Log.d("insertFilm", "${trace()} pageId = $pageId")
-        if( pageId != 0L){
-            val film = Film(itemMap, pageId)
-            res = db?.filmDao()?.insertFilm(film)
+
+    suspend fun insertFilm(itemMap: Map<String, Any>, idPage: Long, channel: Channel<Long>?){
+        var res: Long = 0
+        Log.d("insertFilm", "${trace()} " +
+                "pageId = $idPage " +
+                "page = ${itemMap["page"]}, " +
+                "idKp = ${itemMap["id"]}")
+        if( idPage != 0L){
+            res = db?.filmDao()?.insertFilm(Film(itemMap, idPage))!!
+            Log.d("insertFilm", "${trace()} " +
+                    "pageId = $idPage " +
+                    "page = ${itemMap["page"]}, " +
+                    "idKp = ${itemMap["id"]}, " +
+                    "res = $res")
         }
-        return res != 0L
+        channel?.send(res)
     }
 
     fun isLiked(isView: Boolean, idKp: Int): Boolean{
@@ -33,5 +54,11 @@ object QueryDb {
         val pId = db?.filmDao()?.getPage(page)
         return if (pId == 0L) null
         else db?.filmDao()?.getPageFilms(pId!!)
+    }
+
+    fun checkPages(pages: MutableList<Int>): MutableList<Int>{
+        val chList = mutableListOf<Int>()
+        pages.forEach{ if (db?.filmDao()?.getPage(it) == 0L) chList.add(it)}
+        return chList
     }
 }

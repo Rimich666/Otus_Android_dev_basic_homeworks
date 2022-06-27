@@ -33,7 +33,8 @@ data class NewItem(
         itemMap["previewUrl"] as String,
         itemMap["poster"] as String,
         false,
-        itemMap["liked"] as Boolean)
+        false
+    )
 
     constructor(rec: Favourite): this(
         rec.idKp,

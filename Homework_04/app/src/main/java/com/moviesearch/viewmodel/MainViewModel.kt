@@ -30,33 +30,71 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
     var loading: Boolean = false
     var insertItem: MutableLiveData<Int> = MutableLiveData()
     var deletedItem: MutableLiveData<Int> = MutableLiveData()
-    //var deletedItems: MutableLiveData<Page> = MutableLiveData()
-    //var insertPage: MutableLiveData<Page> = MutableLiveData()
 
-    class Page(var first: Int, var last: Int, page: Int, val size: Int)
+    class Page(var first: Int, var last: Int, page: Int, val size: Int){
+        fun setPos(first: Int){
+            this.first = first
+            this.last = first + this.size - 1
+        }
+    }
     var prevP: Page? = null
-    var currP: Page? = null
+    var centP: Page? = null
     var nextP: Page? = null
 
     private var lastPage = 1
     private var firstPage = 1
 
-    suspend fun getNext(){
-        Log.d("paging", "${trace()} ViewModel.getNext()")
-        lastPage ++
-        Log.d("scrolling", "${trace()} lastPage = $lastPage")
-        val listPage = Repository().getNext(lastPage)
-        Log.d("scrolling", "${trace()} listPage = $listPage")
-
-        if (nextP != null){
-            deletePage(currP!!)
+    private suspend fun deletePage(page: Page){
+        withContext(Dispatchers.Main) {
+            for(i in(page.last downTo page.first step 1)){
+                items.value!!.removeAt(i)
+                deletedItem.value = i
+            }
         }
+    }
 
-        if (nextP == null){
-//               nextP = Page(items.value!!.size, items.value!!.size + 50, lastPage, 50)
-            nextP = Page(items.value!!.size, items.value!!.size + listPage!!.size - 1, lastPage, listPage.size)
-            listPage!!.forEach{
-                    val flm = it
+    suspend fun getPrevious(){
+        firstPage --
+        val listPage = Repository.getPage(firstPage)
+        if (listPage != null){
+            if (prevP != null){
+                if (nextP != null){deletePage(nextP!!)}
+                lastPage --
+                nextP = centP
+                centP = prevP
+                prevP = null
+            }
+            prevP = Page(0,listPage.size - 1, firstPage, listPage.size)
+            centP!!.setPos(prevP!!.size)
+            nextP!!.setPos(centP!!.last + 1)
+            for (i in (listPage.size - 1 downTo 0)){
+                items.value!!.add(
+                    0,
+                    NewItem(listPage[i], favourites.value!!.indexOfFirst {
+                        listPage[i].idKp == it.idKp
+                    } > 0))
+                withContext(Dispatchers.Main) {insertItem.value = 0}
+            }
+        }
+        else firstPage ++
+        loading = false
+    }
+
+    suspend fun getNext(){
+        lastPage ++
+        val listPage = Repository.getPage(lastPage)
+        if (listPage != null){
+            if (nextP != null){
+                if (prevP != null){ deletePage(prevP!!) }
+                firstPage ++
+                prevP = centP
+                prevP!!.setPos(0)
+                centP = nextP
+                centP!!.setPos(prevP!!.size)
+                nextP = null
+            }
+            nextP = Page(items.value!!.size, items.value!!.size + listPage.size - 1, lastPage, listPage.size)
+            listPage.forEach{ flm ->
                 items.value!!.add(
                     items.value!!.size ,
                     NewItem(flm, favourites.value!!.indexOfFirst {
@@ -65,40 +103,21 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
                 withContext(Dispatchers.Main) {insertItem.value = items.value!!.size}
             }
         }
-        else
-            Log.d("paging", "${trace()} Это залёт воин: nextP не null")
-
-
+        else lastPage --
         loading = false
-        Log.d("scrolling", "${trace()} nextP: $nextP")
-    }
-
-    private suspend fun deletePage(page: Page){
-        withContext(Dispatchers.Main) {
-            for(i in(currP!!.size downTo 0 step 1)){
-                Log.d("scrolling", "${trace()} delete $i")
-                items.value!!.removeAt(i)
-                deletedItem.value = i
-            }
-        }
-        //withContext(Dispatchers.Main) { deletedItems.value = currP }
-        Log.d("scrolling", "${trace()} nextP: $nextP")
-        currP = nextP
-        currP!!.first = 0
-        currP!!.last = currP!!.size - 1
-        nextP = null
     }
 
     suspend fun initData(prog: (complete: Boolean)->Unit){
-        Repository().initData {msg ->
-            if (msg.containsKey("max")) maxProgress.value = msg["max"] as Int
-            if (msg.containsKey("progress")) progress.value = msg["progress"] as Int
-            if (msg.containsKey(("complete"))) {
-                currP = Page(0, items.value?.size!! - 1, 1, items.value?.size!!)
-                prog(msg["complete"] as Boolean)
+        Repository.initData {msg ->
+            if (msg[0].containsKey("max")) maxProgress.value = msg[0]["max"] as Int
+            if (msg[0].containsKey("progress")) progress.value = msg[0]["progress"] as Int
+            if (msg[0].containsKey(("complete"))) {}
+            if (msg[0].containsKey("pages")){
+                for (i in 1 until msg.size){items.value?.add(NewItem(msg[i] as MutableMap<*, *>))}
+                centP = Page(0, items.value?.size!! - 1, 1, items.value?.size!!)
+                prog(true)
             }
-            if (msg.containsKey("item")) items.value?.add(NewItem(msg["item"] as MutableMap<*, *>))
-            if (msg.containsKey("favour")) setFavour(msg["favour"] as MutableList<Favourite>)
+            if (msg[0].containsKey("favour")) setFavour(msg[0]["favour"] as MutableList<Favourite>)
         }
     }
 
@@ -112,8 +131,8 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
         val item = forCancel.value!!
         val liked = !item.liked
         val result: Boolean =
-            if (liked) Repository().like(item)
-            else Repository().dislike(item)
+            if (liked) Repository.like(item)
+            else Repository.dislike(item)
         Log.d("cancelLiked", "${trace()} result = $result")
         if (result){
             if (changeItem.value!! > -1){
@@ -137,7 +156,7 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
     suspend fun dislike(itemFav: NewItem, posFav: Int){
         val itemsLoc = items.value!!
         val pos = itemsLoc.indexOfFirst { it.idKp == itemFav.idKp }
-        val result: Boolean = Repository().dislike(itemFav)
+        val result: Boolean = Repository.dislike(itemFav)
         if (result) {
             if (pos > -1) {
                 itemsLoc[pos].liked = false
@@ -157,8 +176,8 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
         Log.d("changeLiked", "${trace()} remove or add favourite")
         val liked = !item.liked
         val result: Boolean =
-        if (liked) Repository().like(item)
-        else Repository().dislike(item)
+        if (liked) Repository.like(item)
+        else Repository.dislike(item)
         if (result) {
             item.liked = liked
             if (liked) favourites.value?.add(item)
