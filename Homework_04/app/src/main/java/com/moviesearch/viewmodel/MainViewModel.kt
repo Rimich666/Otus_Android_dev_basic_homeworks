@@ -43,6 +43,7 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
 
     private var lastPage = 1
     private var firstPage = 1
+    private val startModel = StartViewModel()
 
     private suspend fun deletePage(page: Page){
         withContext(Dispatchers.Main) {
@@ -112,6 +113,7 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
             if (msg[0].containsKey("max")) maxProgress.value = msg[0]["max"] as Int
             if (msg[0].containsKey("progress")) progress.value = msg[0]["progress"] as Int
             if (msg[0].containsKey(("complete"))) {}
+            if (msg[0].containsKey(("requested"))) {startModel.setItems(msg[0]["requested"] as List<Int>)}
             if (msg[0].containsKey("pages")){
                 for (i in 1 until msg.size){items.value?.add(NewItem(msg[i] as MutableMap<*, *>))}
                 centP = Page(0, items.value?.size!! - 1, 1, items.value?.size!!)

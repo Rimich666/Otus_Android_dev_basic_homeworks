@@ -45,17 +45,14 @@ object Repository {
         val currentPage: Int = 1
         val pages = mutableListOf<Int>()
         for(i in currentPage .. SIZEOF + 1 ) pages.add(i)
+        withContext(Dispatchers.Main) {
+            progress(mutableListOf(mutableMapOf("requested" to pages))) }
         Log.d("pages", "${trace()} pages: $pages")
         launch(Dispatchers.IO) {
             LoadData.loadPages(pages) { msg ->
                 var channel: Channel<Long>? = null
                 if (msg[0].containsKey("pages")) {
                     channel = Channel(Channel.RENDEZVOUS)
-                    Log.d(
-                        "insertFilm", "${trace()} " +
-                                "page = ${msg[0]["page"]}, " +
-                                "pages = ${msg[0]["pages"]}"
-                    )
                     launch { insertFilms(msg, channel) }
                     if (msg[0]["page"] == currentPage) {
                         pagesCount = msg[0]["pages"] as Int

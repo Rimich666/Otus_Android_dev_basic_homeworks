@@ -18,10 +18,6 @@ object QueryDb {
         val idPage = pageId.await()
 
         for (i in 1 until itemMaps.size){
-            Log.d("insertFilm", "${trace()} " +
-                    "pageId = $idPage " +
-                    "page[$i] = ${itemMaps[i]["page"]}, " +
-                    "idKp[$i] = ${itemMaps[i]["id"]}")
             launch { insertFilm(itemMaps[i], idPage, channel) }
         }
     }
@@ -29,17 +25,8 @@ object QueryDb {
 
     suspend fun insertFilm(itemMap: Map<String, Any>, idPage: Long, channel: Channel<Long>?){
         var res: Long = 0
-        Log.d("insertFilm", "${trace()} " +
-                "pageId = $idPage " +
-                "page = ${itemMap["page"]}, " +
-                "idKp = ${itemMap["id"]}")
         if( idPage != 0L){
             res = db?.filmDao()?.insertFilm(Film(itemMap, idPage))!!
-            Log.d("insertFilm", "${trace()} " +
-                    "pageId = $idPage " +
-                    "page = ${itemMap["page"]}, " +
-                    "idKp = ${itemMap["id"]}, " +
-                    "res = $res")
         }
         channel?.send(res)
     }

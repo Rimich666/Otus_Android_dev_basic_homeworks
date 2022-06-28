@@ -21,8 +21,6 @@ object LoadData {
     suspend fun loadPages(pages: List<Int>, updateResults: suspend (msg: MutableList<MutableMap<String,Any>>) -> Unit
     ) = coroutineScope {
         val recC = pages.size * (limit + 1)
-        var i = 0
-        var j = 0
         val chProgress = Channel<MutableMap<String, Any>>()
         updateResults(mutableListOf(mutableMapOf("max" to recC, "progress" to 0)))//, "complete" to false))
         val listsOfPage = mutableMapOf<Int, MutableList<MutableMap<String, Any>>>()
@@ -36,26 +34,15 @@ object LoadData {
         }
 
         repeat(recC){
-            j ++
             val item = chProgress.receive()
-            /*Log.d("insertFilm", "${trace()} " +
-                    "итерация = $j из $recC, " +
-                    "page = ${item["page"]}, " +
-                    "idKp = ${item["id"]}, " +
-                    "pages = ${item["pages"]}")*/
             if (item.containsKey("pages")){
                 listsOfPage[item["page"] as Int]!!.add(0, item.toMutableMap())
                 updateResults(listsOfPage[item["page"] as Int]!!)
             }
             else {
                 listsOfPage[item["page"] as Int]!!.add(item.toMutableMap())
-                //updateResults(mapOf("progress" to i))//, "complete" to false))
-                //launch { updateResults(item) }
-                //, "complete" to false))
-                //Log.d("insertFilm", "--------------------------------------------")
             }
         }
-        //updateResults(mapOf("complete" to true))
     }
 
     suspend fun getDetail(id: Int, updateResults: suspend (msg: String) -> Unit
@@ -88,17 +75,6 @@ object LoadData {
             return response.body!!.string()
         }
     }
-
-    /*private val itemMap: MutableMap<String, Any> = mutableMapOf(
-        "id" to 0,
-        "name" to "",
-        "shortDescription" to "",
-        "alternativeName" to "",
-        "poster" to "",
-        "previewUrl" to "",
-        "page" to 0,
-        "item" to true
-    )*/
 
     private suspend fun toBase(json:String,
                                channel:Channel<MutableMap<String,Any>>,

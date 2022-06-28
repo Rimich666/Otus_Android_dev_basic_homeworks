@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.moviesearch.UI.NewItem
-import com.moviesearch.UI.StartFragment
+import com.moviesearch.UI.start.StartFragment
 import com.moviesearch.UI.detail.DetailFragment
 import com.moviesearch.UI.favourites.FavouritesFragment
 import com.moviesearch.UI.list.ListMovieFragment

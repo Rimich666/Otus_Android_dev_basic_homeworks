@@ -23,6 +23,7 @@ class NewItemsViewHolder(private val binding: NewItemBinding) : RecyclerView.Vie
     private val nameTV: TextView = itemView.findViewById(R.id.textName)
     private val detailBtn: Button = itemView.findViewById(R.id.button_detail)
     private val heartIm: ImageView = itemView.findViewById(R.id.heart_image)
+
     @RequiresApi(Build.VERSION_CODES.M)
     fun bind(item: NewItem, listener: NewItemsAdapter.DetailClickListener){
         binding.textName.text = item.name
