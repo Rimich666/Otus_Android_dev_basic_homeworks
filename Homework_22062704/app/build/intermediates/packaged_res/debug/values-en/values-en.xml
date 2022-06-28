@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_favorites">Favorites</string>
+    <string name="app_name">Movie Search</string>
+    <string name="butt_detail">Detail</string>
+    <string name="invite_friend">Invite friend</string>
+</resources>

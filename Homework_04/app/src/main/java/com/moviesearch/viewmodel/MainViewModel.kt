@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.moviesearch.UI.NewItem
+import com.moviesearch.UI.start.StartItem
 import com.moviesearch.datasource.database.Favourite
 import com.moviesearch.repository.Repository
 import com.moviesearch.trace
@@ -43,7 +44,12 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
 
     private var lastPage = 1
     private var firstPage = 1
-    private val startModel = StartViewModel()
+
+    var requestedItems: MutableLiveData<MutableList<StartItem>> = MutableLiveData(mutableListOf(
+        StartItem("jrsahnfdrfjagnharj", ""),
+        StartItem("la;a;aa;'''xdllfjkjvn", "")
+    ))
+    var requestedInserted: MutableLiveData<Int> = MutableLiveData()
 
     private suspend fun deletePage(page: Page){
         withContext(Dispatchers.Main) {
@@ -113,11 +119,22 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
             if (msg[0].containsKey("max")) maxProgress.value = msg[0]["max"] as Int
             if (msg[0].containsKey("progress")) progress.value = msg[0]["progress"] as Int
             if (msg[0].containsKey(("complete"))) {}
-            if (msg[0].containsKey(("requested"))) {startModel.setItems(msg[0]["requested"] as List<Int>)}
+            if (msg[0].containsKey(("requested"))) {
+                val requested = msg[0]["requested"] as List<Int>
+                Log.d("start", "${trace()} $requested")
+                requested.forEach{
+                    Log.d("start", "${trace()} Запрос страницы $it")
+                    requestedItems.value!!.add(
+                    StartItem("Запрос страницы $it", ""))
+
+                    requestedInserted.value = requestedItems.value!!.size - 1
+                    Log.d("start", "${trace()} Добавлен: ${requestedItems.value!![requestedInserted.value!!].action}")
+                }
+            }
             if (msg[0].containsKey("pages")){
                 for (i in 1 until msg.size){items.value?.add(NewItem(msg[i] as MutableMap<*, *>))}
                 centP = Page(0, items.value?.size!! - 1, 1, items.value?.size!!)
-                prog(true)
+            //    prog(true)
             }
             if (msg[0].containsKey("favour")) setFavour(msg[0]["favour"] as MutableList<Favourite>)
         }

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="back_sel_item">#998FA0B3</color>
+    <color name="black">#FF000000</color>
+    <color name="font_sel_item">#F5D1154A</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="white">#FFFFFFFF</color>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <string name="action_favorites">Избранное</string>
+    <string name="app_name">Поиск фильмов</string>
+    <string name="butt_detail">Детали</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="invite_friend">Пригласить друга</string>
+    <string name="movies" translatable="false">
+        [
+            {
+                \"name\": \"Зеленая миля\",
+                \"description\": \"The Green Mile, 1999, 189 мин.\",
+                \"pictures\": \"greenmile\",
+                \"poster\": \"green_mile\"
+            },
+            {
+                \"name\": \"Список Шиндлера\",
+                \"description\": \"Schindler\'s List, 1993, 195 мин.\",
+                \"pictures\": \"schindlerslist\",
+                \"poster\": \"green_mile\"
+            },
+            {
+                \"name\": \"Побег из Шоушенка\",
+                \"description\": \"The Shawshank Redemption, 1994, 142 мин.\",
+                \"pictures\": \"shawshankredemption\",
+                \"poster\": \"green_mile\"
+            },
+            {
+                \"name\": \"Властелин колец: Возвращение короля\",
+                \"description\": \"The Lord of the Rings: The Return of the King, 2003, 201 мин.\",
+                \"pictures\": \"returnking\",
+                \"poster\": \"green_mile\"
+            },
+            {
+                \"name\": \"Форрест Гамп\",
+                \"description\": \"Forrest Gump, 1994, 142 мин.\",
+                \"pictures\": \"forrestgump\",
+                \"poster\": \"green_mile\"
+            },
+            {
+                \"name\": \"Властелин колец: Две крепости\",
+                \"description\":
+                \"The Lord of the Rings: The Two Towers, 2002, 179 мин.\",
+                \"pictures\": \"twotowers\",
+                \"poster\": \"green_mile\"
+            }
+        ]</string>
+    <string name="string_lorem" translatable="false">string/lorem kerjnaerggrvlaerkghkfnhbvjanakfdsnvbfdka.snvdkasfnvdnv.jvnsnvwkrs</string>
+    <string name="title_activity_bottom_nav" translatable="false">BottomNavActivity</string>
+    <string name="title_dashboard" translatable="false">Dashboard</string>
+    <string name="title_home" translatable="false">Home</string>
+    <string name="title_notifications" translatable="false">Notifications</string>
+    <style name="Theme.MovieSearch" parent="Theme.AppCompat.Light.NoActionBar">
+        
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/purple_700</item>
+        <item name="colorAccent">@color/teal_200</item>
+        
+    </style>
+</resources>

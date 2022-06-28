@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.moviesearch.app-mergeDebugResources-37:/values-ldrtl-v17/values-ldrtl-v17.xml",
+            "map": [
+                {
+                    "source": "/home/oem/.gradle/caches/transforms-3/1f9bea958a3aa2445fa1ee6f7e4ceb37/transformed/material-1.4.0/res/values-ldrtl-v17/values-ldrtl-v17.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,191",
+                        "endColumns": "135,140",
+                        "endOffsets": "186,327"
+                    }
+                }
+            ]
+        }
+    ]
+}

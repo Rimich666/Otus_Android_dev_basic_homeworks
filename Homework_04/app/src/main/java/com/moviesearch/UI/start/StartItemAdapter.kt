@@ -1,14 +1,17 @@
 package com.moviesearch.UI.start
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.moviesearch.R
+import com.moviesearch.UI.favourites.FavoriteItemsViewHolder
 import com.moviesearch.databinding.StartItemBinding
+import com.moviesearch.trace
 
 class StartItemAdapter (
-    private val items: List<StartItem>
+    private val items: MutableList<StartItem>
         ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     lateinit var binding: StartItemBinding
@@ -20,7 +23,14 @@ class StartItemAdapter (
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        TODO("Not yet implemented")
+        Log.d("start", "${trace()} Адаптер position: $position")
+        when (holder)
+        {
+            is StartItemViewHolder ->
+            {
+                holder.bind(items[position])
+            }
+        }
     }
 
     override fun getItemCount(): Int = items.size

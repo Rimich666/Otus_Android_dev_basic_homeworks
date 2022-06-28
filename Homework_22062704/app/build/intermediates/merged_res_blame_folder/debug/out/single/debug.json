@@ -1,0 +1,202 @@
+[
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/layout_new_item.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/layout/new_item.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/mipmap-xxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/layout_fragment_favourites.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/layout/fragment_favourites.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/xml_data_extraction_rules.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/xml/data_extraction_rules.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_ic_notifications_black_24dp.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/ic_notifications_black_24dp.xml"
+    },
+    {
+        "merged": "com.moviesearch.app-merged_res-39:/layout_fragment_list_movie.xml.flat",
+        "source": "com.moviesearch.app-main-41:/layout/fragment_list_movie.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/layout_fav_item.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/layout/fav_item.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/layout_fragment_start.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/layout/fragment_start.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/layout_activity_main.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/layout/activity_main.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_ic_launcher_background.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_heart_broken50.png.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/heart_broken50.png"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_view_list_24px.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/view_list_24px.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_favourite_black.png.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/favourite_black.png"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/mipmap-hdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/mipmap-xxxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_heart50.png.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/heart50.png"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/mipmap-mdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_heart_broken130.png.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/heart_broken130.png"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_favourite_color.png.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/favourite_color.png"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_favourite_24px.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/favourite_24px.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_green_mile.jpeg.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/green_mile.jpeg"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_shawshankredemption.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/shawshankredemption.webp"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_details.png.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/details.png"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/menu_bottom_nav_menu.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/menu/bottom_nav_menu.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_forrestgump.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/forrestgump.webp"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_favourite_cont.png.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/favourite_cont.png"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/layout_fragment_list_movie.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/layout/fragment_list_movie.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable-v24_heart130.png.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable-v24/heart130.png"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_returnking.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/returnking.webp"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/mipmap-mdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_schindlerslist.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/schindlerslist.webp"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_twotowers.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/twotowers.webp"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/layout_fragment_detail_old.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/layout/fragment_detail_old.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/layout_fragment_detail_.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/layout/fragment_detail_.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/mipmap-xxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/mipmap-hdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/mipmap-xhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_ic_home_black_24dp.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/ic_home_black_24dp.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/mipmap-xhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.moviesearch.app-merged_res-39:/layout_activity_main.xml.flat",
+        "source": "com.moviesearch.app-main-41:/layout/activity_main.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable-anydpi-v24_ic_launcher_foreground.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-pngs-34:/drawable-anydpi-v24/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_greenmile.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/greenmile.webp"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/layout-land_fragment_favourites.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/layout-land/fragment_favourites.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/mipmap-xxxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/drawable_ic_dashboard_black_24dp.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/drawable/ic_dashboard_black_24dp.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/layout-land_fragment_list_movie.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/layout-land/fragment_list_movie.xml"
+    },
+    {
+        "merged": "com.moviesearch.app-merged_res-39:/layout-land_fragment_list_movie.xml.flat",
+        "source": "com.moviesearch.app-main-41:/layout-land/fragment_list_movie.xml"
+    },
+    {
+        "merged": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-merged_res-39:/xml_backup_rules.xml.flat",
+        "source": "/home/oem/.gradle/daemon/7.3.3/com.moviesearch.app-main-41:/xml/backup_rules.xml"
+    }
+]
