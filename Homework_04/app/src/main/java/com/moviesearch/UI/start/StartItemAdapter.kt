@@ -17,6 +17,7 @@ class StartItemAdapter (
     lateinit var binding: StartItemBinding
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        Log.d("start", "${trace()} $items")
         val inflater = LayoutInflater.from(parent.context)
         binding = DataBindingUtil.inflate(inflater, R.layout.start_item, parent, false)
         return StartItemViewHolder(binding)

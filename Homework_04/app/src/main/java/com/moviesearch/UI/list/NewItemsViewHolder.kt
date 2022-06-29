@@ -32,7 +32,7 @@ class NewItemsViewHolder(private val binding: NewItemBinding) : RecyclerView.Vie
         var back_color = cont.resources.getColor(R.color.white, cont.theme)
         var font_color = cont.resources.getColor(R.color.black, cont.theme)
         if(item.Selected)
-           {back_color = cont.resources.getColor(R.color.back_sel_item, cont.theme)
+           {back_color = cont.resources.getColor(android.R.color.system_neutral1_200, cont.theme)
             font_color = cont.resources.getColor(R.color.font_sel_item, cont.theme)}
         var iconFav = (cont.resources.getIdentifier("favourite_cont","drawable",cont.packageName))
         if(item.liked){iconFav = (cont.resources.getIdentifier("favourite_color","drawable",cont.packageName))}

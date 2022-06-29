@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView
 import com.moviesearch.R
 import com.moviesearch.databinding.FragmentStartBinding
 import com.moviesearch.trace
@@ -25,8 +27,9 @@ class StartFragment : Fragment() {
         items = mainModel.requestedItems.value!!
         mainModel.progress.observe(this) { binding.progressHorizontal.progress = it }
         mainModel.requestedInserted.observe(this){
-            //Log.d("start", "${trace()} Запрос страницы $it")
+            Log.d("start", "${trace()} Перед notifyItemInserted $it")
             binding.recyclerStart.adapter!!.notifyItemInserted(it)
+            Log.d("start", "${trace()} После notifyItemInserted $it")
         }
         mainModel.requestedItems.observe(this){binding.recyclerStart.adapter!!.notifyDataSetChanged()}
     }
@@ -36,12 +39,16 @@ class StartFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_start, container, false)
+        val view: View = binding.root
         initRecycler()
-        return binding.root
+        return view
     }
 
     private fun initRecycler(){
         binding.recyclerStart.adapter = StartItemAdapter(items)
+        val dividerItemDecoration = DividerItemDecoration(context, RecyclerView.VERTICAL)
+        dividerItemDecoration.setDrawable(resources.getDrawable(R.drawable.divider, context?.theme))
+        binding.recyclerStart.addItemDecoration(dividerItemDecoration)
     }
 
     companion object {

@@ -46,8 +46,7 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
     private var firstPage = 1
 
     var requestedItems: MutableLiveData<MutableList<StartItem>> = MutableLiveData(mutableListOf(
-        StartItem("jrsahnfdrfjagnharj", ""),
-        StartItem("la;a;aa;'''xdllfjkjvn", "")
+
     ))
     var requestedInserted: MutableLiveData<Int> = MutableLiveData()
 
@@ -128,7 +127,7 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
                     StartItem("Запрос страницы $it", ""))
 
                     requestedInserted.value = requestedItems.value!!.size - 1
-                    Log.d("start", "${trace()} Добавлен: ${requestedItems.value!![requestedInserted.value!!].action}")
+                    //Log.d("start", "${trace()} Добавлен: ${requestedItems.value!![requestedInserted.value!!].action}")
                 }
             }
             if (msg[0].containsKey("pages")){

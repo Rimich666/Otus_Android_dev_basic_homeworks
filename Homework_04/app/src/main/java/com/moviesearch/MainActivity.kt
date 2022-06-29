@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity(),
         setContentView(R.layout.activity_main)
         val navView = findViewById<BottomNavigationView>(R.id.nav_view)
         navView.setOnItemSelectedListener { itemSelected(it) }
-        Log.d("MainActivity.OnCreate", "текущий фрагмент: ${viewModel.currFragment}")
+        Log.d("MainActivity.OnCreate", "${trace()} текущий фрагмент: ${viewModel.currFragment}")
         inflateFragment[viewModel.currFragment]?.let { it() }
     }
 
