@@ -140,7 +140,7 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
                     val pos = msg[0]["requestedPage"].toString().toInt() - 1
                     val item = requestedItems.value!![pos] as StartItem.Requested
                     item.requested.action = "$REQUEST_TITLE ${msg[0]["requestedPage"]} " +
-                            "завершился  с кодом ${msg[0]["codeResponse"].toString()}"
+                            " код: ${msg[0]["codeResponse"].toString()}"
                     item.requested.result = msg[0]["codeResponse"].toString()
                     requestedItemChanged.value = pos
                 }
