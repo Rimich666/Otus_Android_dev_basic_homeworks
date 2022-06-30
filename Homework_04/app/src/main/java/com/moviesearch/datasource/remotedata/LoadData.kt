@@ -3,6 +3,7 @@ package com.moviesearch.datasource.remotedata
 import android.util.JsonReader
 import android.util.JsonToken
 import android.util.Log
+import com.moviesearch.Keys
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import okhttp3.*
@@ -24,9 +25,8 @@ object LoadData {
     ) = coroutineScope {
         val recC = pages.size * limit
         val chProgress = Channel<MutableMap<String, Any>>()
-        Log.d("start", "${trace()} max = $recC")
 
-        updateResults(mutableListOf(mutableMapOf("max" to recC)))//, "complete" to false))
+        updateResults(mutableListOf(mutableMapOf(Keys.max to recC)))//, "complete" to false))
         val listsOfPage = mutableMapOf<Int, MutableList<MutableMap<String, Any>>>()
 
         for (page in pages) {
@@ -44,7 +44,7 @@ object LoadData {
         repeat(recC + pages.size * 2){
             val item = chProgress.receive()
             when{
-                item.containsKey("pages") ->{
+                item.containsKey(Keys.pages) ->{
                     listsOfPage[item["page"] as Int]!!.add(0, item.toMutableMap())
                     updateResults(listsOfPage[item["page"] as Int]!!)
                 }
@@ -72,7 +72,6 @@ object LoadData {
         urlBuilder.addQueryParameter("token", TOKEN)
 
         pars.forEach{ (key, value) -> if(key == "search") {
-                Log.d("request", "${trace()} Это всё таки мап: ${value is Map<*, *>}")
                 val search = value as Map<*,*>
                 search.forEach{ (k, v) -> urlBuilder.addQueryParameter("search", v.toString())
                     urlBuilder.addQueryParameter("field", k.toString())}
@@ -86,12 +85,12 @@ object LoadData {
         var successful = false
         try {
             okHttpClient.newCall(request).execute().use { response ->
-                Log.d("request", "${trace()} Код респонса: ${response.code} ${response.message}")
                 codeResponse = response.code
                 if (!response.isSuccessful){
                     returned = null
                     throw IOException("непонятки какие-то с кодом ${response.code}")
                 }
+                successful = true
                 returned = response.body!!.string()
             }
         }
@@ -99,9 +98,9 @@ object LoadData {
             returned = null
         }
         channel?.send(mutableMapOf(
-            "codeResponse" to codeResponse,
-            "requestedPage" to pars["page"]!!,
-            "successful" to successful))
+            Keys.codeResponse to codeResponse,
+            Keys.requestedPage to pars["page"]!!,
+            Keys.successful to successful))
         return returned
 
     }

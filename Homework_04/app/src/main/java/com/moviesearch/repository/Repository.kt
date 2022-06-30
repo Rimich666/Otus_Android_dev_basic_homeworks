@@ -2,6 +2,7 @@ package com.moviesearch.repository
 
 import android.util.Log
 import com.moviesearch.App.Companion.db
+import com.moviesearch.Keys
 import com.moviesearch.UI.NewItem
 import com.moviesearch.datasource.database.Favourite
 import com.moviesearch.datasource.database.Film
@@ -20,16 +21,13 @@ object Repository {
     private var progressI: Int = 0
 
     suspend fun getPage(page: Int): MutableList<Film>? {
-        Log.d("scrolling", "${trace()} pagesCount = $pagesCount")
         if (page < 1 || page > pagesCount) return null
         CoroutineScope(Dispatchers.Default).launch(Dispatchers.IO){
             var pages = mutableListOf<Int>()
             for(i in page - SIZEOF .. page + SIZEOF) if (!(i < 1 || i > pagesCount)) pages.add(i)
-            Log.d("scrolling", "${trace()} pages до $pages")
             pages = QueryDb.checkPages(pages)
-            Log.d("scrolling", "${trace()} pages после $pages")
             LoadData.loadPages(pages){msg ->
-                if (msg[0].containsKey("pages"))
+                if (msg[0].containsKey(Keys.pages))
                     launch { insertFilms(msg, null) }
                 }
         }
@@ -46,16 +44,16 @@ object Repository {
         val pages = mutableListOf<Int>()
         for(i in currentPage .. SIZEOF + 1 ) pages.add(i)
         withContext(Dispatchers.Main) {
-            progress(mutableListOf(mutableMapOf("requested" to pages))) }
+            progress(mutableListOf(mutableMapOf(Keys.requested to pages))) }
         Log.d("pages", "${trace()} pages: $pages")
         launch(Dispatchers.IO) {
             LoadData.loadPages(pages) { msg ->
                 var channel: Channel<Long>? = null
-                if (msg[0].containsKey("pages")) {
+                if (msg[0].containsKey(Keys.pages)) {
                     channel = Channel(Channel.RENDEZVOUS)
                     launch { insertFilms(msg, channel) }
                     if (msg[0]["page"] == currentPage) {
-                        pagesCount = msg[0]["pages"] as Int
+                        pagesCount = msg[0][Keys.pages] as Int
                         withContext(Dispatchers.Main) { progress(msg) }
                     }
                 }
@@ -65,13 +63,13 @@ object Repository {
                         val inc = channel.receive()
                         progressI++
                         withContext(Dispatchers.Main) {
-                            progress(mutableListOf(mutableMapOf("progress" to progressI)))
+                            progress(mutableListOf(mutableMapOf(Keys.progress to progressI)))
                         }
                     }
             }
         }
         val favour: Deferred<MutableList<Favourite>> = async{ db?.filmDao()?.getFavourites()!!}
-        progress(mutableListOf(mutableMapOf("favour" to favour.await())))
+        progress(mutableListOf(mutableMapOf(Keys.favour to favour.await())))
     }
 
     suspend fun getDetails(id: Int, takeDetails: (msg: String)->Unit) = coroutineScope{

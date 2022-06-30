@@ -26,7 +26,7 @@ class StartFragment : Fragment() {
         mainModel.currFragment = "start"
         items = mainModel.requestedItems.value!!
         mainModel.requestedItemChanged.observe(this){binding.recyclerStart.adapter!!.notifyItemChanged(it)}
-        mainModel.progress.observe(this) { binding.progressHorizontal.progress = it }
+        //mainModel.progress.observe(this) { binding.progressHorizontal.progress = it }
         mainModel.requestedInserted.observe(this){
             binding.recyclerStart.adapter!!.notifyItemInserted(it)
             }

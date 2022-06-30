@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.moviesearch.Keys
 import com.moviesearch.UI.NewItem
 import com.moviesearch.UI.start.InitCashItem
 import com.moviesearch.UI.start.RequestedItem
@@ -22,8 +23,6 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
     var firstStart: Boolean = settings["firstStart"] as Boolean
     var selectedPosition: Int = settings["selectedPosition"] as Int
     var detailsText: String = ""
-    var progress: MutableLiveData<Int> = MutableLiveData(settings["progress"] as Int)
-    var maxProgress: MutableLiveData<Int> = MutableLiveData(0)
     var items: MutableLiveData<MutableList<NewItem>> = MutableLiveData(mutableListOf())
     var favourites: MutableLiveData<MutableList<NewItem>> = MutableLiveData(mutableListOf())
 
@@ -122,37 +121,34 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
         Repository.initData {msg ->
             Log.d("start", "${trace()} ${msg[0].keys}")
             when{
-                msg[0].containsKey("max") -> {
-                    Log.d("start", "${trace()} max = ${msg[0]["max"]}")
-                    //maxProgress.value = msg[0]["max"] as Int
+                msg[0].containsKey(Keys.max) -> {
                     val item = requestedItems.value!![requestedItems.value!!.size - 1] as StartItem.InitCash
                     item.initCash.max = msg[0]["max"] as Int
                     requestedItemChanged.value = requestedItems.value!!.size - 1
                 }
-                msg[0].containsKey("progress") -> {
-                    //progress.value = msg[0]["progress"] as kotlin.Int
+                msg[0].containsKey(Keys.progress) -> {
                     val item = requestedItems.value!![requestedItems.value!!.size - 1] as StartItem.InitCash
-                    item.initCash.progress = msg[0]["progress"] as Int
+                    item.initCash.progress = msg[0][Keys.progress] as Int
                     requestedItemChanged.value = requestedItems.value!!.size - 1
                 }
                 msg[0].containsKey(("complete")) -> {}
-                msg[0].containsKey("codeResponse") -> {
-                    val pos = msg[0]["requestedPage"].toString().toInt() - 1
+                msg[0].containsKey(Keys.codeResponse) -> {
+                    val pos = msg[0][Keys.requestedPage].toString().toInt() - 1
                     val item = requestedItems.value!![pos] as StartItem.Requested
-                    item.requested.action = "$REQUEST_TITLE ${msg[0]["requestedPage"]} " +
-                            " код: ${msg[0]["codeResponse"].toString()}"
-                    item.requested.result = msg[0]["codeResponse"].toString()
+                    item.requested.action = "$REQUEST_TITLE ${msg[0][Keys.requestedPage]} " +
+                            " завершён с кодом: ${msg[0][Keys.codeResponse].toString()}"
+                    item.requested.successful = msg[0][Keys.successful] as Boolean
                     requestedItemChanged.value = pos
                 }
-                msg[0].containsKey(("requested")) -> {
-                    val requested = msg[0]["requested"] as List<Int>
+                msg[0].containsKey((Keys.requested)) -> {
+                    val requested = msg[0][Keys.requested] as List<Int>
                     Log.d("start", "${trace()} $requested")
                     requested.forEach{
                         requestedItems.value!!.add(
                             StartItem.Requested(
                                 RequestedItem(
                                     "$REQUEST_TITLE $it",
-                                    ""
+                                    null
                                 )
                             ))
                         requestedInserted.value = requestedItems.value!!.size - 1
@@ -165,12 +161,12 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
                         )
                     )
                 }
-                msg[0].containsKey("pages") -> {
+                msg[0].containsKey(Keys.pages) -> {
                     for (i in 1 until msg.size){items.value?.add(NewItem(msg[i] as MutableMap<*, *>))}
                     centP = Page(0, items.value?.size!! - 1, 1, items.value?.size!!)
                     //    prog(true)
                 }
-                msg[0].containsKey("favour") -> setFavour(msg[0]["favour"] as MutableList<Favourite>)
+                msg[0].containsKey(Keys.favour) -> setFavour(msg[0][Keys.favour] as MutableList<Favourite>)
             }
         }
     }

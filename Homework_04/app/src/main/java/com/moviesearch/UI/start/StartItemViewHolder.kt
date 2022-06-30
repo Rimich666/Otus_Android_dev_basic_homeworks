@@ -1,5 +1,7 @@
 package com.moviesearch.UI.start
 
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import androidx.recyclerview.widget.RecyclerView
 import com.moviesearch.databinding.InitCashItemBinding
 import com.moviesearch.databinding.RequestedItemBinding
@@ -7,7 +9,14 @@ import com.moviesearch.databinding.RequestedItemBinding
 class RequestedViewHolder(private val binding: RequestedItemBinding): RecyclerView.ViewHolder(binding.root){
     fun bind(item: StartItem.Requested){
         binding.textAction.text = item.requested.action
-        binding.textResult.text = item.requested.result
+        if (item.requested.successful == null){
+            binding.progressRequest.visibility = VISIBLE
+            binding.imageSuccessful.visibility = INVISIBLE
+        }
+        else{
+            binding.progressRequest.visibility = INVISIBLE
+            binding.imageSuccessful.visibility = VISIBLE
+        }
     }
 }
 

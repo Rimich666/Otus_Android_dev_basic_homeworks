@@ -1,6 +1,8 @@
 package com.moviesearch.UI.start
 
-class RequestedItem(var action: String, var result: String)
+import kotlin.properties.Delegates
+
+class RequestedItem(var action: String, var successful: Boolean?)
 
 class InitCashItem(var aText: String){
     var max: Int = 0
