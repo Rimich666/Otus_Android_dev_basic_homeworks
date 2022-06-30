@@ -25,12 +25,11 @@ class StartFragment : Fragment() {
         //startModel = ViewModelProvider(this)[StartViewModel::class.java]
         mainModel.currFragment = "start"
         items = mainModel.requestedItems.value!!
+        mainModel.requestedItemChanged.observe(this){binding.recyclerStart.adapter!!.notifyItemChanged(it)}
         mainModel.progress.observe(this) { binding.progressHorizontal.progress = it }
         mainModel.requestedInserted.observe(this){
-            Log.d("start", "${trace()} Перед notifyItemInserted $it")
             binding.recyclerStart.adapter!!.notifyItemInserted(it)
-            Log.d("start", "${trace()} После notifyItemInserted $it")
-        }
+            }
         mainModel.requestedItems.observe(this){binding.recyclerStart.adapter!!.notifyDataSetChanged()}
     }
 

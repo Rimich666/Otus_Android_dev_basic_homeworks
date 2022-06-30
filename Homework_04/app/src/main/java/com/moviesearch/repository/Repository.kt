@@ -59,8 +59,9 @@ object Repository {
                         withContext(Dispatchers.Main) { progress(msg) }
                     }
                 }
+                else withContext(Dispatchers.Main) { progress(msg) }
                 if (channel != null)
-                    repeat(msg.size - 2) {
+                    repeat(msg.size - 1) {
                         val inc = channel.receive()
                         progressI++
                         withContext(Dispatchers.Main) {

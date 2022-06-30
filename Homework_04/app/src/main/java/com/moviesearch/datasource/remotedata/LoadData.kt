@@ -11,49 +11,62 @@ import java.io.IOException
 import java.io.StringReader
 import com.moviesearch.trace
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
+import java.lang.Exception
 
 object LoadData {
     private var okHttpClient: OkHttpClient = OkHttpClient()
-    private const val URL = "https://api.kinopoisk.dev/movie"
+    private const val URL = "https://api.kinopoisk.dev/movie"//"https://api.kinopoisk.dev/movie"
     private const val TOKEN = "MKRJKN4-Q0B463J-J85RBPK-ENWYABY"
     private var limit = 50
 
-    suspend fun loadPages(pages: List<Int>, updateResults: suspend (msg: MutableList<MutableMap<String,Any>>) -> Unit
+    suspend fun loadPages(pages: List<Int>,
+                          updateResults: suspend (msg: MutableList<MutableMap<String,Any>>) -> Unit
     ) = coroutineScope {
-        val recC = pages.size * (limit + 1)
+        val recC = pages.size * limit
         val chProgress = Channel<MutableMap<String, Any>>()
-        updateResults(mutableListOf(mutableMapOf("max" to recC, "progress" to 0)))//, "complete" to false))
+        Log.d("start", "${trace()} max = $recC")
+
+        updateResults(mutableListOf(mutableMapOf("max" to recC)))//, "complete" to false))
         val listsOfPage = mutableMapOf<Int, MutableList<MutableMap<String, Any>>>()
 
         for (page in pages) {
             listsOfPage[page] = mutableListOf()
             launch {
-                val json: String = request(mapOf("page" to page.toString(), "limit" to limit.toString()))
-                toBase(json, chProgress, page)
+                val json: String? = request(
+                    mapOf("page" to page.toString(),
+                        "limit" to limit.toString()),
+                    chProgress
+                )
+                if (json != null) toBase(json, chProgress, page)
             }
         }
 
-        repeat(recC){
+        repeat(recC + pages.size * 2){
             val item = chProgress.receive()
-            if (item.containsKey("pages")){
-                listsOfPage[item["page"] as Int]!!.add(0, item.toMutableMap())
-                updateResults(listsOfPage[item["page"] as Int]!!)
-            }
-            else {
-                listsOfPage[item["page"] as Int]!!.add(item.toMutableMap())
+            when{
+                item.containsKey("pages") ->{
+                    listsOfPage[item["page"] as Int]!!.add(0, item.toMutableMap())
+                    updateResults(listsOfPage[item["page"] as Int]!!)
+                }
+                item.containsKey("id") -> {
+                    listsOfPage[item["page"] as Int]!!.add(item.toMutableMap())
+                }
+                else -> {updateResults(mutableListOf(item))}
             }
         }
     }
 
     suspend fun getDetail(id: Int, updateResults: suspend (msg: String) -> Unit
     ) = coroutineScope{
-        val json: Deferred<String> =
-        async { request(mapOf("search" to mapOf<String, String>("id" to id.toString()))) }
-        updateResults(json.await())
+        var json: String = ""
+        val jsonDef: Deferred<String?> =
+        async { request(mapOf("search" to mapOf<String, String>("id" to id.toString())), null) }
+        if (jsonDef.await() != null)
+            json = jsonDef.await()!!
+        updateResults(json)
     }
 
-    private fun request(pars:Map<String,*>):String {
-        Log.d("request", "${trace()} request")
+    private suspend fun request(pars:Map<String,*>, channel: Channel<MutableMap<String, Any>>?):String? {
         val urlBuilder: HttpUrl.Builder =
             URL.toHttpUrlOrNull()?.newBuilder() ?: error("URL не удался")
         urlBuilder.addQueryParameter("token", TOKEN)
@@ -68,12 +81,29 @@ object LoadData {
         }
         val url: String = urlBuilder.build().toString()
         val request: Request = Request.Builder().url(url).build()
-
-        okHttpClient.newCall(request).execute().use { response ->
-            Log.d("request", "${trace()} Код респонса: ${response.code} ${response.message}")
-            if (!response.isSuccessful) throw IOException("непонятки какие-то $response")
-            return response.body!!.string()
+        var returned: String?
+        var codeResponse: Int = 666
+        var successful = false
+        try {
+            okHttpClient.newCall(request).execute().use { response ->
+                Log.d("request", "${trace()} Код респонса: ${response.code} ${response.message}")
+                codeResponse = response.code
+                if (!response.isSuccessful){
+                    returned = null
+                    throw IOException("непонятки какие-то с кодом ${response.code}")
+                }
+                returned = response.body!!.string()
+            }
         }
+        catch(e: Exception){
+            returned = null
+        }
+        channel?.send(mutableMapOf(
+            "codeResponse" to codeResponse,
+            "requestedPage" to pars["page"]!!,
+            "successful" to successful))
+        return returned
+
     }
 
     private suspend fun toBase(json:String,

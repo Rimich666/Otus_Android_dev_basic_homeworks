@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="5"
-            tools:listitem="@layout/start_item"/>
+            tools:listitem="@layout/requested_item"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
