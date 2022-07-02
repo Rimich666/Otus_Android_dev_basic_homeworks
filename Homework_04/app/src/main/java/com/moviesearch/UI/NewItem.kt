@@ -33,7 +33,7 @@ data class NewItem(
         itemMap["previewUrl"] as String,
         itemMap["poster"] as String,
         false,
-        false
+        itemMap["licked"] as Boolean
     )
 
     constructor(rec: Favourite): this(

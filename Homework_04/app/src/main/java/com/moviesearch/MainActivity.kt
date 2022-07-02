@@ -6,12 +6,17 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 
 
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.moviesearch.Keys.complete
 import com.moviesearch.UI.NewItem
 import com.moviesearch.UI.start.StartFragment
 import com.moviesearch.UI.detail.DetailFragment
@@ -22,6 +27,7 @@ import com.moviesearch.repository.Repository
 import com.moviesearch.viewmodel.MainViewModel
 import com.moviesearch.viewmodel.MainViewModelFactory
 import kotlinx.coroutines.*
+import kotlin.system.exitProcess
 
 
 class MainActivity : AppCompatActivity(),
@@ -48,18 +54,22 @@ class MainActivity : AppCompatActivity(),
         viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
         items = viewModel.items.value!!
         viewModel.forCancel.observe(this){ showCancel() }
+        viewModel.responseComplete.observe(this){
+            if (!viewModel.responseComplete.value!!){ showRepeat() }
 
+        }
+        viewModel.atAll.observe(this){ if(it) inflateFragment["list"]?.let { it() }}
         Log.d("MainActivity.OnCreate", "${viewModel.firstStart}")
         if (viewModel.firstStart){
             scope.launch {
-                viewModel.initData{complete -> if(complete) inflateFragment["list"]?.let { it() }}
+                //viewModel.initData{complete -> if(complete) inflateFragment["list"]?.let { it() }}
+                viewModel.initData()
             }
             viewModel.firstStart = false
         }
         setContentView(R.layout.activity_main)
         val navView = findViewById<BottomNavigationView>(R.id.nav_view)
         navView.setOnItemSelectedListener { itemSelected(it) }
-        Log.d("MainActivity.OnCreate", "${trace()} текущий фрагмент: ${viewModel.currFragment}")
         inflateFragment[viewModel.currFragment]?.let { it() }
     }
 
@@ -152,11 +162,28 @@ class MainActivity : AppCompatActivity(),
         val liked = viewModel.forCancel.value?.liked
         val map = mapOf(true to "добавили", false to "удалили")
         val zakus = Snackbar.make(
-            findViewById(R.id.container),
+            findViewById(binding.container.id),
             "Вы успешно ${map[liked]} фильм: ${viewModel.forCancel.value?.name}",
             Snackbar.LENGTH_LONG
         )
         zakus.setAction("Отменить") { cancelLiked() }
+        zakus.show()
+    }
+
+    private fun showRepeat(){
+        val zakus = Snackbar.make(
+            findViewById(binding.container.id),
+            "Не все страницы были успешно загружены",
+            Snackbar.LENGTH_LONG
+        )
+        zakus.setAction("Повторить?") { scope.launch { viewModel.initData() }}
+        zakus.addCallback(object : Snackbar.Callback(){
+            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                when(event){
+                    DISMISS_EVENT_TIMEOUT -> exitProcess(-1)
+                }
+            }
+        })
         zakus.show()
     }
 }

@@ -15,6 +15,7 @@ object Keys{
     const val requestedPage = "requestedPage"
     const val successful = "successful"
     const val requested = "requested"
+    const val complete = "complete"
 
     const val pages = "pages"
     const val favour = "favour"

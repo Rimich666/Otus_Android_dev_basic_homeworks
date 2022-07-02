@@ -3,12 +3,14 @@ package com.moviesearch.UI.start
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import androidx.recyclerview.widget.RecyclerView
+import com.moviesearch.R
 import com.moviesearch.databinding.InitCashItemBinding
 import com.moviesearch.databinding.RequestedItemBinding
 
 class RequestedViewHolder(private val binding: RequestedItemBinding): RecyclerView.ViewHolder(binding.root){
     fun bind(item: StartItem.Requested){
         binding.textAction.text = item.requested.action
+        val cont = binding.root.context
         if (item.requested.successful == null){
             binding.progressRequest.visibility = VISIBLE
             binding.imageSuccessful.visibility = INVISIBLE
@@ -16,6 +18,12 @@ class RequestedViewHolder(private val binding: RequestedItemBinding): RecyclerVi
         else{
             binding.progressRequest.visibility = INVISIBLE
             binding.imageSuccessful.visibility = VISIBLE
+            if (item.requested.successful!!)
+                binding.imageSuccessful.setImageResource(
+                    cont.resources.getIdentifier("checked", "drawable", cont.packageName))
+            else
+                binding.imageSuccessful.setImageResource(
+                    cont.resources.getIdentifier("cross", "drawable", cont.packageName))
         }
     }
 }

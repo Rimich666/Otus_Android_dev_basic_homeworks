@@ -11,14 +11,15 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.io.IOException
 import java.io.StringReader
 import com.moviesearch.trace
-import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import java.lang.Exception
 
 object LoadData {
     private var okHttpClient: OkHttpClient = OkHttpClient()
-    private const val URL = "https://api.kinopoisk.dev/movie"//"https://api.kinopoisk.dev/movie"
+    private const val BAD_URL = "https://api.kinopoisk.dev/movje"
+    private const val GOOD_URL = "https://api.kinopoisk.dev/movie"
     private const val TOKEN = "MKRJKN4-Q0B463J-J85RBPK-ENWYABY"
     private var limit = 50
+
 
     suspend fun loadPages(pages: List<Int>,
                           updateResults: suspend (msg: MutableList<MutableMap<String,Any>>) -> Unit
@@ -30,12 +31,17 @@ object LoadData {
         val listsOfPage = mutableMapOf<Int, MutableList<MutableMap<String, Any>>>()
 
         for (page in pages) {
+//=========================================================================================
+val url = if ((pages.indexOf(page) % 2) != 0) BAD_URL
+else GOOD_URL
+//=========================================================================================
             listsOfPage[page] = mutableListOf()
             launch {
                 val json: String? = request(
                     mapOf("page" to page.toString(),
                         "limit" to limit.toString()),
-                    chProgress
+                    chProgress,
+                    url
                 )
                 if (json != null) toBase(json, chProgress, page)
             }
@@ -60,13 +66,13 @@ object LoadData {
     ) = coroutineScope{
         var json: String = ""
         val jsonDef: Deferred<String?> =
-        async { request(mapOf("search" to mapOf<String, String>("id" to id.toString())), null) }
+        async { request(mapOf("search" to mapOf<String, String>("id" to id.toString())), null, GOOD_URL) }
         if (jsonDef.await() != null)
             json = jsonDef.await()!!
         updateResults(json)
     }
 
-    private suspend fun request(pars:Map<String,*>, channel: Channel<MutableMap<String, Any>>?):String? {
+    private suspend fun request(pars:Map<String,*>, channel: Channel<MutableMap<String, Any>>?, URL: String):String? {
         val urlBuilder: HttpUrl.Builder =
             URL.toHttpUrlOrNull()?.newBuilder() ?: error("URL не удался")
         urlBuilder.addQueryParameter("token", TOKEN)

@@ -7,9 +7,7 @@ import com.moviesearch.UI.NewItem
 import com.moviesearch.datasource.database.Favourite
 import com.moviesearch.datasource.database.Film
 import com.moviesearch.datasource.database.QueryDb
-import com.moviesearch.datasource.database.QueryDb.insertFilm
 import com.moviesearch.datasource.database.QueryDb.insertFilms
-import com.moviesearch.datasource.database.QueryDb.isLiked
 import com.moviesearch.datasource.remotedata.LoadData
 import com.moviesearch.trace
 import kotlinx.coroutines.*
@@ -39,25 +37,56 @@ object Repository {
         return QueryDb.getPage(page)
     }
 
+    private var currentPage: Int = 1
+    private var pages: MutableList<Int>? = null
+
     suspend fun initData(progress: (msg: MutableList<MutableMap<String,Any>>)->Unit) = coroutineScope{
-        val currentPage: Int = 1
-        val pages = mutableListOf<Int>()
-        for(i in currentPage .. SIZEOF + 1 ) pages.add(i)
-        withContext(Dispatchers.Main) {
-            progress(mutableListOf(mutableMapOf(Keys.requested to pages))) }
-        Log.d("pages", "${trace()} pages: $pages")
+        var replay: Boolean = true
+        //val pages = mutableListOf<Int>()
+        Log.d("start", "${trace()} pages: $pages")
+        if (pages == null){
+            replay = false
+            pages = mutableListOf()
+            for(i in currentPage .. SIZEOF + 1 ) pages!!.add(i)
+            withContext(Dispatchers.Main) {
+                progress(mutableListOf(mutableMapOf(Keys.requested to pages!!))) }
+        }
+        var successful = true
+        var responseCount = 0
+        val responseTotal = pages!!.size
+
         launch(Dispatchers.IO) {
-            LoadData.loadPages(pages) { msg ->
+            LoadData.loadPages(pages!!) { msg ->
                 var channel: Channel<Long>? = null
-                if (msg[0].containsKey(Keys.pages)) {
-                    channel = Channel(Channel.RENDEZVOUS)
-                    launch { insertFilms(msg, channel) }
-                    if (msg[0]["page"] == currentPage) {
-                        pagesCount = msg[0][Keys.pages] as Int
-                        withContext(Dispatchers.Main) { progress(msg) }
+                when{
+                    msg[0].containsKey(Keys.pages) -> {
+                        channel = Channel(Channel.RENDEZVOUS)
+                        launch { insertFilms(msg, channel) }
+                        if (msg[0]["page"] == currentPage) {
+                            pagesCount = msg[0][Keys.pages] as Int
+                            withContext(Dispatchers.Main) { progress(msg) }
+                        }
                     }
+                    msg[0].containsKey(Keys.codeResponse) ->{
+                        responseCount++
+                        Log.d("start", "${trace()} responseCount = $responseCount")
+                        val succ = msg[0][Keys.successful] as Boolean
+                        successful = successful && succ
+                        withContext(Dispatchers.Main) { progress(msg) }
+                        if (succ) pages!!.remove(msg[0][Keys.requestedPage].toString().toInt())
+                        Log.d("start", "${trace()} successful: $successful")
+                        Log.d("start", "${trace()} requestedPage: ${msg[0][Keys.requestedPage]}")
+                        Log.d("start", "${trace()} pages: $pages")
+                        if (responseCount == responseTotal)
+                            withContext(Dispatchers.Main) {
+                                progress(mutableListOf(mutableMapOf(Keys.complete to successful)))
+                            }
+                    }
+                    msg[0].containsKey(Keys.max) ->{
+                        if (!replay) withContext(Dispatchers.Main) { progress(msg) }
+                    }
+                    else -> withContext(Dispatchers.Main) { progress(msg) }
                 }
-                else withContext(Dispatchers.Main) { progress(msg) }
                 if (channel != null)
                     repeat(msg.size - 1) {
                         val inc = channel.receive()
@@ -68,8 +97,11 @@ object Repository {
                     }
             }
         }
-        val favour: Deferred<MutableList<Favourite>> = async{ db?.filmDao()?.getFavourites()!!}
-        progress(mutableListOf(mutableMapOf(Keys.favour to favour.await())))
+        if (!replay){
+            val favour: Deferred<MutableList<Favourite>> = async{ db?.filmDao()?.getFavourites()!!}
+            progress(mutableListOf(mutableMapOf(Keys.favour to favour.await())))
+        }
+
     }
 
     suspend fun getDetails(id: Int, takeDetails: (msg: String)->Unit) = coroutineScope{

@@ -54,6 +54,9 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
     var requestedInserted: MutableLiveData<Int> = MutableLiveData()
     var requestedItemChanged: MutableLiveData<Int> = MutableLiveData()
 
+    var responseComplete: MutableLiveData<Boolean> = MutableLiveData(true)
+    var atAll: MutableLiveData<Boolean> = MutableLiveData(false)
+
     private suspend fun deletePage(page: Page){
         withContext(Dispatchers.Main) {
             for(i in(page.last downTo page.first step 1)){
@@ -117,9 +120,8 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
         loading = false
     }
 
-    suspend fun initData(prog: (complete: Boolean)->Unit){
+    suspend fun initData(){
         Repository.initData {msg ->
-            Log.d("start", "${trace()} ${msg[0].keys}")
             when{
                 msg[0].containsKey(Keys.max) -> {
                     val item = requestedItems.value!![requestedItems.value!!.size - 1] as StartItem.InitCash
@@ -130,8 +132,11 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
                     val item = requestedItems.value!![requestedItems.value!!.size - 1] as StartItem.InitCash
                     item.initCash.progress = msg[0][Keys.progress] as Int
                     requestedItemChanged.value = requestedItems.value!!.size - 1
+                    if (item.initCash.progress == item.initCash.max) atAll.value = true
                 }
-                msg[0].containsKey(("complete")) -> {}
+                msg[0].containsKey((Keys.complete)) -> {
+                    responseComplete.value = msg[0][Keys.complete] as Boolean
+                }
                 msg[0].containsKey(Keys.codeResponse) -> {
                     val pos = msg[0][Keys.requestedPage].toString().toInt() - 1
                     val item = requestedItems.value!![pos] as StartItem.Requested
@@ -142,7 +147,6 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
                 }
                 msg[0].containsKey((Keys.requested)) -> {
                     val requested = msg[0][Keys.requested] as List<Int>
-                    Log.d("start", "${trace()} $requested")
                     requested.forEach{
                         requestedItems.value!!.add(
                             StartItem.Requested(
@@ -162,9 +166,15 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
                     )
                 }
                 msg[0].containsKey(Keys.pages) -> {
-                    for (i in 1 until msg.size){items.value?.add(NewItem(msg[i] as MutableMap<*, *>))}
+
+                    for (i in 1 until msg.size){
+                        favourites.value?.indexOfFirst { item -> item.idKp == msg[i]["id"] as Int}
+                        msg[i]["licked"] = (favourites.value?.indexOfFirst { item -> item.idKp == msg[i]["id"] as Int}!! > -1)
+                        items.value?.add(NewItem(msg[i] as MutableMap<*, *>))
+                        Log.d("start", "${trace()} ${msg[i]}")
+                    }
                     centP = Page(0, items.value?.size!! - 1, 1, items.value?.size!!)
-                    //    prog(true)
+
                 }
                 msg[0].containsKey(Keys.favour) -> setFavour(msg[0][Keys.favour] as MutableList<Favourite>)
             }
