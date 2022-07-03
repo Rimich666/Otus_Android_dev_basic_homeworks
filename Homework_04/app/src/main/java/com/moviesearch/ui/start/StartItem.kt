@@ -1,6 +1,4 @@
-package com.moviesearch.UI.start
-
-import kotlin.properties.Delegates
+package com.moviesearch.ui.start
 
 class RequestedItem(var action: String, var successful: Boolean?)
 

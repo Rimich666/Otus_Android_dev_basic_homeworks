@@ -1,6 +1,5 @@
-package com.moviesearch.UI.start
+package com.moviesearch.ui.start
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil

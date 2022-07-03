@@ -6,22 +6,17 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.SnackbarResult
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 
 
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.moviesearch.Keys.complete
-import com.moviesearch.UI.NewItem
-import com.moviesearch.UI.start.StartFragment
-import com.moviesearch.UI.detail.DetailFragment
-import com.moviesearch.UI.favourites.FavouritesFragment
-import com.moviesearch.UI.list.ListMovieFragment
+import com.moviesearch.ui.NewItem
+import com.moviesearch.ui.start.StartFragment
+import com.moviesearch.ui.detail.DetailFragment
+import com.moviesearch.ui.favourites.FavouritesFragment
+import com.moviesearch.ui.list.ListMovieFragment
 import com.moviesearch.databinding.ActivityMainBinding
 import com.moviesearch.repository.Repository
 import com.moviesearch.viewmodel.MainViewModel

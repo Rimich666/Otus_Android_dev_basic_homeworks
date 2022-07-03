@@ -3,7 +3,7 @@ package com.moviesearch.repository
 import android.util.Log
 import com.moviesearch.App.Companion.db
 import com.moviesearch.Keys
-import com.moviesearch.UI.NewItem
+import com.moviesearch.ui.NewItem
 import com.moviesearch.datasource.database.Favourite
 import com.moviesearch.datasource.database.Film
 import com.moviesearch.datasource.database.QueryDb
@@ -42,8 +42,6 @@ object Repository {
 
     suspend fun initData(progress: (msg: MutableList<MutableMap<String,Any>>)->Unit) = coroutineScope{
         var replay: Boolean = true
-        //val pages = mutableListOf<Int>()
-        Log.d("start", "${trace()} pages: $pages")
         if (pages == null){
             replay = false
             pages = mutableListOf()
@@ -69,14 +67,10 @@ object Repository {
                     }
                     msg[0].containsKey(Keys.codeResponse) ->{
                         responseCount++
-                        Log.d("start", "${trace()} responseCount = $responseCount")
                         val succ = msg[0][Keys.successful] as Boolean
                         successful = successful && succ
                         withContext(Dispatchers.Main) { progress(msg) }
                         if (succ) pages!!.remove(msg[0][Keys.requestedPage].toString().toInt())
-                        Log.d("start", "${trace()} successful: $successful")
-                        Log.d("start", "${trace()} requestedPage: ${msg[0][Keys.requestedPage]}")
-                        Log.d("start", "${trace()} pages: $pages")
                         if (responseCount == responseTotal)
                             withContext(Dispatchers.Main) {
                                 progress(mutableListOf(mutableMapOf(Keys.complete to successful)))
@@ -120,7 +114,6 @@ object Repository {
     }
 
     suspend fun like(item: NewItem): Boolean = coroutineScope{
-        Log.d("cancelLiked", "${trace()} item = ${item.pictures}")
         val res: Deferred<Long?> = async { db?.filmDao()?.insertFavourite(Favourite(item)) }
         return@coroutineScope res.await()!=0L
     }

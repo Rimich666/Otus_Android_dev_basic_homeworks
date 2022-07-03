@@ -1,30 +1,22 @@
-package com.moviesearch.UI.list
+package com.moviesearch.ui.list
 
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.moviesearch.MainActivity
 
-import com.moviesearch.UI.NewItem
+import com.moviesearch.ui.NewItem
 import com.moviesearch.R
-import com.moviesearch.UI.favourites.FavouritesFragment
 import com.moviesearch.databinding.FragmentListMovieBinding
-import com.moviesearch.trace
 import com.moviesearch.viewmodel.MainViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 
 class ListMovieFragment : Fragment() {

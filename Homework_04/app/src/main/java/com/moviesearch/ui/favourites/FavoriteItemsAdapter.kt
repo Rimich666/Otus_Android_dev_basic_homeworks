@@ -1,13 +1,12 @@
-package com.moviesearch.UI.favourites
+package com.moviesearch.ui.favourites
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.moviesearch.UI.NewItem
+import com.moviesearch.ui.NewItem
 import com.moviesearch.R
 import com.moviesearch.databinding.FavItemBinding
-import com.moviesearch.databinding.NewItemBinding
 
 class FavoriteItemsAdapter (
     private  val items: List<NewItem>,

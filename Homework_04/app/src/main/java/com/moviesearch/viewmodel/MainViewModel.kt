@@ -5,10 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.moviesearch.Keys
-import com.moviesearch.UI.NewItem
-import com.moviesearch.UI.start.InitCashItem
-import com.moviesearch.UI.start.RequestedItem
-import com.moviesearch.UI.start.StartItem
+import com.moviesearch.ui.NewItem
+import com.moviesearch.ui.start.InitCashItem
+import com.moviesearch.ui.start.RequestedItem
+import com.moviesearch.ui.start.StartItem
 import com.moviesearch.datasource.database.Favourite
 import com.moviesearch.repository.Repository
 import com.moviesearch.trace

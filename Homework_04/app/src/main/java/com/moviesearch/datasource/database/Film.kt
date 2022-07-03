@@ -1,9 +1,8 @@
 package com.moviesearch.datasource.database
 
-import android.util.Log
 import androidx.room.*
 import androidx.room.ForeignKey.CASCADE
-import com.moviesearch.UI.NewItem
+import com.moviesearch.ui.NewItem
 
 @Entity(
     tableName = "list_films",

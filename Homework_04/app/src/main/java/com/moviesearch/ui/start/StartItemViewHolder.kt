@@ -1,9 +1,8 @@
-package com.moviesearch.UI.start
+package com.moviesearch.ui.start
 
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import androidx.recyclerview.widget.RecyclerView
-import com.moviesearch.R
 import com.moviesearch.databinding.InitCashItemBinding
 import com.moviesearch.databinding.RequestedItemBinding
 

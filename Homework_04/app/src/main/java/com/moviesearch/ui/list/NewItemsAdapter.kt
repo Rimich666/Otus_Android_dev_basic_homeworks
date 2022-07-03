@@ -1,4 +1,4 @@
-package com.moviesearch.UI.list
+package com.moviesearch.ui.list
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import com.moviesearch.UI.NewItem
+import com.moviesearch.ui.NewItem
 import com.moviesearch.R
 import com.moviesearch.databinding.NewItemBinding
 

@@ -1,4 +1,4 @@
-package com.moviesearch.UI.detail
+package com.moviesearch.ui.detail
 
 import android.os.Bundle
 import android.view.LayoutInflater

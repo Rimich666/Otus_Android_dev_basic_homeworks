@@ -1,8 +1,8 @@
-package com.moviesearch.UI.favourites
+package com.moviesearch.ui.favourites
 
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.moviesearch.UI.NewItem
+import com.moviesearch.ui.NewItem
 import com.moviesearch.databinding.FavItemBinding
 
 class FavoriteItemsViewHolder(private val binding: FavItemBinding) : RecyclerView.ViewHolder(binding.root) {

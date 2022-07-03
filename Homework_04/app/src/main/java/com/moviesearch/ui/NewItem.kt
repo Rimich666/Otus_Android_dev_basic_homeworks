@@ -1,7 +1,5 @@
-package com.moviesearch.UI
+package com.moviesearch.ui
 
-import android.os.Bundle
-import androidx.core.os.bundleOf
 import com.moviesearch.datasource.database.Favourite
 import com.moviesearch.datasource.database.Film
 

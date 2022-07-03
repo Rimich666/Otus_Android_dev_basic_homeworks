@@ -1,4 +1,4 @@
-package com.moviesearch.UI.favourites
+package com.moviesearch.ui.favourites
 
 import android.content.Context
 import android.os.Bundle
@@ -8,9 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import com.moviesearch.UI.NewItem
+import com.moviesearch.ui.NewItem
 import com.moviesearch.R
-import com.moviesearch.UI.list.ListMovieFragment
 import com.moviesearch.databinding.FragmentFavouritesBinding
 import com.moviesearch.viewmodel.MainViewModel
 

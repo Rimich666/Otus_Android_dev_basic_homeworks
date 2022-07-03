@@ -1,21 +1,15 @@
-package com.moviesearch.UI.list
+package com.moviesearch.ui.list
 
-import android.app.Activity
 import android.os.Build
-import android.util.Log
-import android.view.LayoutInflater
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
-import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.databinding.DataBindingUtil
 import com.bumptech.glide.Glide
-import com.moviesearch.UI.NewItem
+import com.moviesearch.ui.NewItem
 import com.moviesearch.R
 import com.moviesearch.databinding.NewItemBinding
-import com.moviesearch.trace
 
 
 class NewItemsViewHolder(private val binding: NewItemBinding) : RecyclerView.ViewHolder(binding.root){

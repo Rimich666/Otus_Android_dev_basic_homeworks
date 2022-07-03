@@ -5,7 +5,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".UI.start.StartFragment">
+        tools:context=".ui.start.StartFragment">
 
 
         <androidx.recyclerview.widget.RecyclerView
