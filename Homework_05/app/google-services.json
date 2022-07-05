@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "110741658805",
+    "project_id": "moviesearch-dfb58",
+    "storage_bucket": "moviesearch-dfb58.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:110741658805:android:a89aad8a172742ffc6f2fc",
+        "android_client_info": {
+          "package_name": "com.moviesearch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "110741658805-uqqvojrn39ptlpfnamhpnkl42upreqch.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQRwtgke1d5hyTGUk-orzYGgkAEfQXwJw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "110741658805-uqqvojrn39ptlpfnamhpnkl42upreqch.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
