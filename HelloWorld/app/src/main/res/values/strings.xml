@@ -34,4 +34,8 @@
             }
         ]</string>
     <string name="lorem">"jhfvb,hb.kbf,sdbcmxbcksb.kdjbf.,jbdkjbfck.jsbd,bc,mnzbxc.,k.wjedbzxmcbn.nASKLKDNJFC/LKVKFNVNSDJSBDJJDBCJJJJjnnjnjdsksddk kdn kdfd kf kjdfkgjkldfllkfl "</string>
+    <string name="input_date">введите дату</string>
+    <string name="input_time">введите время</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>
