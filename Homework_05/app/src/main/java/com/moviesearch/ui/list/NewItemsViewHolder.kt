@@ -31,7 +31,7 @@ class NewItemsViewHolder(private val binding: NewItemBinding) : RecyclerView.Vie
         var iconFav = (cont.resources.getIdentifier("favourite_cont","drawable",cont.packageName))
         if(item.liked){iconFav = (cont.resources.getIdentifier("favourite_color","drawable",cont.packageName))}
         heartIm.setImageResource(iconFav)
-        itemView.setBackgroundColor(back_color)
+        binding.card.setCardBackgroundColor(back_color)
         binding.textName.setTextColor(font_color)
         Glide.with(cont)
             .load(item.pictures)

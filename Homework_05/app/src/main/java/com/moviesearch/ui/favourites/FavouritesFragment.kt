@@ -17,7 +17,6 @@ class FavouritesFragment : Fragment() {
     private lateinit var binding: FragmentFavouritesBinding
     private lateinit var mainModel: MainViewModel
     lateinit var host: Host
-//    private lateinit var items: MutableList<NewItem>
     private lateinit var favourites: MutableList<NewItem>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,8 +26,6 @@ class FavouritesFragment : Fragment() {
         favourites = mainModel.favourites.value!!
         mainModel.removeFavourite.observe(this){binding.recyclerFavor.adapter?.notifyItemRemoved(it)}
         mainModel.insertFavourite.observe(this){binding.recyclerFavor.adapter?.notifyItemInserted(it)}
-//        items = mainModel.items.value!!
-
     }
 
     override fun onAttach(context: Context) {

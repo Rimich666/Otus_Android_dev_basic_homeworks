@@ -80,7 +80,6 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun takeDetails(msg: String){
-        //Log.d("request", "${trace()} $msg")
         viewModel.detailsText = msg
         inflateFragment["detl"]?.let { it() }
     }

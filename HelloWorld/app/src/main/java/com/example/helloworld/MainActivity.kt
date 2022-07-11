@@ -14,6 +14,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.startActivity
+import androidx.fragment.app.FragmentManager
 import com.example.helloworld.database.DbObject
 import com.example.helloworld.database.Film
 import com.example.helloworld.database.FilmDb
@@ -49,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         val btnDrop = findViewById<Button>(R.id.button_destroy_db)
         val btnRetro = findViewById<Button>(R.id.button_retrofit)
         val btnCor = findViewById<Button>(R.id.button_coroutines)
+        val btnDatePicker = findViewById<Button>(R.id.button_date_picker)
         txt = findViewById<TextView>(R.id.textView)
         prgBar = findViewById(R.id.progress)
         rndPrg = findViewById(R.id.round_progress)
@@ -63,8 +65,14 @@ class MainActivity : AppCompatActivity() {
         btnDrop.setOnClickListener{ dropDb() }
         btnRetro.setOnClickListener{ retrofit() }
         btnCor.setOnClickListener{ coroutines() }
+        btnDatePicker.setOnClickListener{ datePickerInflate() }
 
     }
+
+    private fun datePickerInflate(){
+        DateTimeDialog.newInstance().show(supportFragmentManager, DateTimeDialog.TAG)
+    }
+
 
     private fun coroutines(){
         j = 0

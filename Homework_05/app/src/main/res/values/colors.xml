@@ -9,4 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="back_sel_item">#95E0E5EA</color>
     <color name="font_sel_item">#F5D1154A</color>
+    <color name="red">#FF0000</color>
+    <color name="green">#00FF00</color>
+    <color name="back_image_button">#1A6E757C</color>
 </resources>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="DateDialogTheme" parent="ThemeOverlay.AppCompat.Dialog">
+        <!--header background-->
+        <item name="colorAccent">@color/design_default_color_primary</item>
+        <!--selected day-->
+        <item name="android:colorControlActivated">@color/design_default_color_primary</item>
+        <!--days of the month-->
+        <!--<item name="android:textColorPrimary">@android:color/holo_orange_dark</item>-->
+        <!--days of the week-->
+        <!--<item name="android:textColorSecondary">@android:color/holo_blue_dark</item>-->
+    </style>
+</resources>
