@@ -52,6 +52,7 @@ class SelectedDateTime(){
     }
     private fun setDateTime(){
         dateTime = LocalDateTime.of(date, time)
+        Log.d("datetime", dateTime.format(DateTimeFormatter.ISO_DATE_TIME))
     }
     fun dateStr():String{
         return date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))

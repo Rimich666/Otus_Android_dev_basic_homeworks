@@ -3,6 +3,7 @@ package com.moviesearch.datasource.database
 import androidx.room.*
 import androidx.room.ForeignKey.CASCADE
 import com.moviesearch.ui.NewItem
+import java.time.LocalDateTime
 
 @Entity(
     tableName = "list_films",
@@ -54,6 +55,22 @@ data class Favourite(
 
 @Entity(tableName = "pages", indices = [Index("num", unique = true)])
 data class Page(val num: Int){
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0
+}
+
+@Entity(
+    tableName = "deferred",
+    indices = [Index("id_kp", unique = true)]
+)
+data class Deferred(
+    val name: String,
+    @ColumnInfo(name = "date_time") val dateTime: String,
+    @ColumnInfo(name = "id_kp") val idKp: Int,
+    @ColumnInfo(name = "short_description") val shortDescription: String,
+    @ColumnInfo(name = "preview_url") val previewUrl: String,
+    @ColumnInfo(name = "alternativeName") val alternativeName: String
+){
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 }

@@ -11,7 +11,9 @@ data class NewItem(
     val pictures: String,
     var poster: String ,
     var Selected: Boolean,
-    var liked: Boolean)
+    var liked: Boolean,
+    var deferred: Boolean
+)
 {
     constructor(itmap:Map<String,String>, Selected: Boolean, liked: Boolean):this(
         0,
@@ -21,7 +23,8 @@ data class NewItem(
         itmap["pictures"] as String,
         itmap["poster"] as String,
         Selected,
-        liked)
+        liked,
+    false)
 
     constructor(itemMap: MutableMap<*, *>):this(
         itemMap["id"] as Int,
@@ -31,7 +34,8 @@ data class NewItem(
         itemMap["previewUrl"] as String,
         itemMap["poster"] as String,
         false,
-        itemMap["licked"] as Boolean
+        itemMap["licked"] as Boolean,
+        false
     )
 
     constructor(rec: Favourite): this(
@@ -42,7 +46,8 @@ data class NewItem(
         rec.previewUrl,
         "",
         false,
-        true
+        true,
+        false
     )
     constructor(rec: Film, liked: Boolean): this(
         rec.idKp,
@@ -52,6 +57,7 @@ data class NewItem(
         rec.previewUrl,
         "",
         false,
-        liked
+        liked,
+        false
     )
 }
