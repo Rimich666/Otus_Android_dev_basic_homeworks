@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.replace
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.moviesearch.ui.NewItem
 import com.moviesearch.R
 import com.moviesearch.databinding.FragmentListMovieBinding
+import com.moviesearch.ui.date_time_picker.DateTimeDialog
 import com.moviesearch.viewmodel.MainViewModel
 
 
@@ -111,6 +113,13 @@ class ListMovieFragment : Fragment() {
                 override fun onHeartClick(newsItem: NewItem, position: Int) {
                     host.likedItem(newsItem, position)
                 }
+
+                override fun onDeferClick(newsItem: NewItem, position: Int) {
+
+                    host.defer(newsItem, position)
+                }
+
+
             }
         )
     }
@@ -123,6 +132,7 @@ class ListMovieFragment : Fragment() {
     interface HostList{
         fun showDetail(position: Int)
         fun likedItem(item: NewItem, position: Int)
+        fun defer(item: NewItem, position: Int)
         fun getNext()
         fun getPrevious()
     }

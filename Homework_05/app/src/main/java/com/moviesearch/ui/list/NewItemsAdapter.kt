@@ -41,5 +41,6 @@ class NewItemsAdapter (
             fun onDetailClick(newsItem: NewItem, position: Int)
             fun onItemLongClick(newsItem: NewItem, position: Int):Boolean
             fun onHeartClick(newsItem: NewItem, position: Int)
+            fun onDeferClick(newsItem: NewItem, position: Int)
         }
     }

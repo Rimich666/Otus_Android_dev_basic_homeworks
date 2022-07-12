@@ -60,10 +60,10 @@ data class Page(val num: Int){
 }
 
 @Entity(
-    tableName = "deferred",
+    tableName = "deferred_films",
     indices = [Index("id_kp", unique = true)]
 )
-data class Deferred(
+data class DeferredFilm(
     val name: String,
     @ColumnInfo(name = "date_time") val dateTime: String,
     @ColumnInfo(name = "id_kp") val idKp: Int,

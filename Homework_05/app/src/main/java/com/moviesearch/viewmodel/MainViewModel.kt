@@ -253,6 +253,8 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
             }
         }
     }
+
+    suspend fun removeOrAddDeferred(item: NewItem, pos: Int){}
 }
 
 class MainViewModelFactory(private val setings: Map<String, *>): ViewModelProvider.Factory{

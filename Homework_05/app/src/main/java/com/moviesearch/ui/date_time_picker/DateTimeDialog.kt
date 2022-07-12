@@ -17,6 +17,7 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.DialogFragment
 import com.moviesearch.R
+import com.moviesearch.trace
 import kotlinx.coroutines.*
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -87,6 +88,7 @@ class DateTimeDialog : DialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d("datetime", "${trace()} $container")
         val view = inflater.inflate(R.layout.date_time_dialog, container, false)
         btnOK = view.findViewById(R.id.button_ok_date_time)
         btnCancel = view.findViewById(R.id.button_cancel_date_time)

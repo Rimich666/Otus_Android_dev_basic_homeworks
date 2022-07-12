@@ -23,12 +23,17 @@ class NewItemsViewHolder(private val binding: NewItemBinding) : RecyclerView.Vie
                 cont.resources.getColor(R.color.black, cont.theme)
         val iconFav =
             if(item.liked)
-                (cont.resources.getIdentifier("favourite_color","drawable",cont.packageName))
-            else (cont.resources.getIdentifier("favourite_cont","drawable",cont.packageName))
-
+                cont.resources.getIdentifier("favourite_color","drawable",cont.packageName)
+            else cont.resources.getIdentifier("favourite_cont","drawable",cont.packageName)
+        val iconDefer =
+            if(item.deferred)
+                cont.resources.getIdentifier("save_time_color", "drawable", cont.packageName)
+            else
+                cont.resources.getIdentifier("save_time", "drawable", cont.packageName)
 
         binding.detailImage.setImageResource(cont.resources.getIdentifier("details", "drawable", cont.packageName))
         binding.heartImage.setImageResource(iconFav)
+        binding.deferredImage.setImageResource(iconDefer)
         binding.textShortDescription.text = item.description
         binding.textName.setTextColor(fontColor)
         binding.textName.text = item.name
@@ -37,8 +42,10 @@ class NewItemsViewHolder(private val binding: NewItemBinding) : RecyclerView.Vie
             .load(item.pictures)
             .into(binding.image)
 
-        binding.buttonDetail.setOnClickListener { (listener.onDetailClick(item, absoluteAdapterPosition)) }
-        itemView.setOnLongClickListener{(listener.onItemLongClick(item, absoluteAdapterPosition))}
-        binding.heartImage.setOnClickListener{(listener.onHeartClick(item, absoluteAdapterPosition))}
+        binding.buttonDetail.setOnClickListener { listener.onDetailClick(item, absoluteAdapterPosition) }
+        itemView.setOnLongClickListener{ listener.onItemLongClick(item, absoluteAdapterPosition) }
+        binding.detailImage.setOnClickListener{ listener.onDetailClick(item, absoluteAdapterPosition) }
+        binding.heartImage.setOnClickListener{ listener.onHeartClick(item, absoluteAdapterPosition) }
+        binding.deferredImage.setOnClickListener{ listener.onDeferClick(item, absoluteAdapterPosition) }
     }
 }

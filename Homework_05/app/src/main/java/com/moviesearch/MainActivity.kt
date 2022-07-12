@@ -8,6 +8,9 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.replace
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 
 
@@ -20,6 +23,7 @@ import com.moviesearch.ui.favourites.FavouritesFragment
 import com.moviesearch.ui.list.ListMovieFragment
 import com.moviesearch.databinding.ActivityMainBinding
 import com.moviesearch.repository.Repository
+import com.moviesearch.ui.date_time_picker.DateTimeDialog
 import com.moviesearch.viewmodel.MainViewModel
 import com.moviesearch.viewmodel.MainViewModelFactory
 import kotlinx.coroutines.*
@@ -130,7 +134,6 @@ class MainActivity : AppCompatActivity(),
                 Toast.makeText(applicationContext, "Ну ладно", Toast.LENGTH_LONG).show()
             }
             .show()
-
     }
 
     override fun dislike(item: NewItem, pos: Int){
@@ -147,6 +150,13 @@ class MainActivity : AppCompatActivity(),
 
     override fun likedItem(item: NewItem, position: Int) {
         scope.launch { viewModel.removeOrAddFavour(item, position) }
+    }
+
+    override fun defer(item: NewItem, position: Int) {
+        DateTimeDialog.newInstance().setFragmentResultListener()
+            .show(supportFragmentManager, DateTimeDialog.TAG)
+
+        //scope.launch { viewModel.removeOrAddDeferred(item, position) }
     }
 
     private fun cancelLiked(){

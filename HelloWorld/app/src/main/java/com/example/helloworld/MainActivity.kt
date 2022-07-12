@@ -69,6 +69,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun datePickerInflate(){
         DateTimeDialog.newInstance().show(supportFragmentManager, DateTimeDialog.TAG)
     }
