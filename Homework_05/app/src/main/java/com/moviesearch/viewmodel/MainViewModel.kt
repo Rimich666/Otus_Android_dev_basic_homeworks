@@ -5,9 +5,12 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.moviesearch.Keys
+import com.moviesearch.WMTAG
 import com.moviesearch.ui.NewItem
 import com.moviesearch.ui.start.InitCashItem
 import com.moviesearch.ui.start.RequestedItem
@@ -19,6 +22,8 @@ import com.moviesearch.workers.DetailWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
+import java.time.LocalDateTime
+import java.time.Period
 import java.util.concurrent.TimeUnit
 
 const val REQUEST_TITLE = "Запрос страницы"
@@ -259,14 +264,19 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
         }
     }
 
-    suspend fun removeOrAddDeferred(item: NewItem, pos: Int, dateTime: String, ctx: Context){
+    suspend fun addDeferred(item: NewItem, pos: Int, dateTime: String, ctx: Context){
         Log.d("deferred", "${trace()} remove or add deferred")
+
         val workRequest = OneTimeWorkRequestBuilder<DetailWorker>()
             .setInitialDelay(15, TimeUnit.SECONDS)
+            .addTag(WMTAG)
+            .setInputData(item.workData(dateTime))
             .build()
         WorkManager
             .getInstance(ctx)
-            .enqueue(workRequest)
+            .enqueueUniqueWork(item.idKp.toString(), ExistingWorkPolicy.REPLACE, workRequest)
+        item.deferred = true
+        withContext(Dispatchers.Main){changeItem.value = pos}
     }
 }
 

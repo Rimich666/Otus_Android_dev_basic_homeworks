@@ -19,6 +19,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import com.moviesearch.R
+import com.moviesearch.databinding.DateTimeDialogBinding
 import com.moviesearch.trace
 import kotlinx.coroutines.*
 import java.time.LocalDate
@@ -69,19 +70,13 @@ class SelectedDateTime(){
 
 @RequiresApi(Build.VERSION_CODES.O)
 class DateTimeDialog : DialogFragment() {
-    private lateinit var btnOK: Button
-    private lateinit var btnCancel: Button
-    private lateinit var twDate: TextView
-    private lateinit var twTime: TextView
-    private lateinit var timePicker: TimePicker
-    private lateinit var datePicker: DatePicker
     private lateinit var image: ImageView
     private lateinit var xodiki: Job
     private lateinit var pulsar: Job
     lateinit var currentView: View
     private var selection = SelectedDateTime()
     private val scope = CoroutineScope(Dispatchers.Default)
-
+    private lateinit var binding: DateTimeDialogBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -92,53 +87,46 @@ class DateTimeDialog : DialogFragment() {
     ): View? {
         Log.d("datetime", "${trace()} $container")
         val view = inflater.inflate(R.layout.date_time_dialog, container, false)
-        btnOK = view.findViewById(R.id.button_ok_date_time)
-        btnCancel = view.findViewById(R.id.button_cancel_date_time)
-        twDate = view.findViewById(R.id.text_date)
-        twTime = view.findViewById(R.id.text_time)
-        timePicker = view.findViewById(R.id.time_picker)
-        datePicker = view.findViewById(R.id.date_picker)
-        image = view.findViewById(R.id.image_clock_alarm)
-        btnOK.setOnClickListener{ clickOk() }
-        btnCancel.setOnClickListener{ clickCancel() }
-        twDate.setOnClickListener { datePickerShow() }
-        twTime.setOnClickListener { timePickerShow() }
+        binding.buttonOkDateTime.setOnClickListener{ clickOk() }
+        binding.buttonCancelDateTime.setOnClickListener{ clickCancel() }
+        binding.textDate.setOnClickListener { datePickerShow() }
+        binding.textTime.setOnClickListener { timePickerShow() }
         xodiki = scope.launch { xodiki() }
         xodiki.start()
         pulsar = scope.launch { pulsar() }
         pulsar.start()
         currentView = image
 
-        datePicker.setOnDateChangedListener{ _, year, month, day -> dateChanged(year, month, day)}
-        timePicker.setOnTimeChangedListener{ _, hour, minute -> timeChanged(hour, minute) }
+        binding.datePicker.setOnDateChangedListener{ _, year, month, day -> dateChanged(year, month, day)}
+        binding.timePicker.setOnTimeChangedListener{ _, hour, minute -> timeChanged(hour, minute) }
 
         return view
     }
 
     private fun timeChanged(hour: Int, minute: Int){
         selection.setTime(hour, minute, 0)
-        twTime.text = selection.timeStr()
-        twTime.setTextColor(resources.getColor(selection.timeColor, context?.theme))
+        binding.textTime.text = selection.timeStr()
+        binding.textTime.setTextColor(resources.getColor(selection.timeColor, context?.theme))
     }
 
     private fun dateChanged(year: Int, month: Int, day: Int){
         selection.setDate(year, month + 1, day)
-        twDate.text = selection.dateStr()
-        twDate.setTextColor(resources.getColor(selection.dateColor, context?.theme))
+        binding.textDate.text = selection.dateStr()
+        binding.textDate.setTextColor(resources.getColor(selection.dateColor, context?.theme))
     }
 
     private suspend fun pulsar(){
         val sts = 20f
         val fns = 30f
-        val twDateHeight = twDate.height
+        val twDateHeight = binding.textDate.height
         val increaseTextAnimator = ValueAnimator.ofFloat(sts, fns)
         increaseTextAnimator.addUpdateListener {
             val value = it.animatedValue as Float
-            twDate.textSize = value
-            twDate.height = twDateHeight
+            binding.textDate.textSize = value
+            binding.textDate.height = twDateHeight
         }
         increaseTextAnimator.duration = 300L
-        val decreaseTextAnimator = ObjectAnimator.ofFloat(twDate,"textSize", fns, sts)
+        val decreaseTextAnimator = ObjectAnimator.ofFloat(binding.textDate,"textSize", fns, sts)
         decreaseTextAnimator.duration = 200L
         val animatorSet = AnimatorSet()
         animatorSet.play(increaseTextAnimator).before(decreaseTextAnimator)
@@ -154,8 +142,8 @@ class DateTimeDialog : DialogFragment() {
         while (!selection.selected){
             delay(1000L)
             selection.set()
-            twTime.text = selection.timeStr()
-            twDate.text = selection.dateStr()
+            binding.textTime.text = selection.timeStr()
+            binding.textDate.text = selection.dateStr()
         }
     }
 
@@ -191,12 +179,12 @@ class DateTimeDialog : DialogFragment() {
     }
 
     private fun timePickerShow(){
-        startAnimationDatePicker(timePicker)
+        startAnimationDatePicker(binding.timePicker)
     }
 
     private fun datePickerShow(){
         pulsar.cancel()
-        startAnimationDatePicker(datePicker)
+        startAnimationDatePicker(binding.datePicker)
     }
 
     private fun clickOk(){

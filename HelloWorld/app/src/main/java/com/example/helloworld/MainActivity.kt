@@ -29,6 +29,7 @@ import okhttp3.*
 import retrofit2.Retrofit
 import java.io.IOException
 import java.io.StringReader
+import java.time.LocalDateTime
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
@@ -51,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         val btnRetro = findViewById<Button>(R.id.button_retrofit)
         val btnCor = findViewById<Button>(R.id.button_coroutines)
         val btnDatePicker = findViewById<Button>(R.id.button_date_picker)
+        val btnExperiments = findViewById<Button>(R.id.button_date_time_exp)
         txt = findViewById<TextView>(R.id.textView)
         prgBar = findViewById(R.id.progress)
         rndPrg = findViewById(R.id.round_progress)
@@ -66,12 +68,18 @@ class MainActivity : AppCompatActivity() {
         btnRetro.setOnClickListener{ retrofit() }
         btnCor.setOnClickListener{ coroutines() }
         btnDatePicker.setOnClickListener{ datePickerInflate() }
-
+        btnExperiments.setOnClickListener{ timeExperiments() }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun datePickerInflate(){
         DateTimeDialog.newInstance().show(supportFragmentManager, DateTimeDialog.TAG)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun timeExperiments(){
+        val dateTime = LocalDateTime.now().plusNanos(15)
+        if (dateTime > LocalDateTime.now()){Log.d("dateTime", "работает")}
     }
 
 

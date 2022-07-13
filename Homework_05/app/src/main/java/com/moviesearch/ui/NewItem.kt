@@ -1,5 +1,6 @@
 package com.moviesearch.ui
 
+import androidx.work.workDataOf
 import com.moviesearch.datasource.database.Favourite
 import com.moviesearch.datasource.database.Film
 
@@ -60,4 +61,11 @@ data class NewItem(
         liked,
         false
     )
+    fun workData(dateTime: String) = run { workDataOf(
+        "name" to name,
+        "altName" to altName,
+        "description" to description,
+        "pictures" to pictures,
+        "dateTime" to dateTime
+    )}
 }
