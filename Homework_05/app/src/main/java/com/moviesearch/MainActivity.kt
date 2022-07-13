@@ -152,11 +152,8 @@ class MainActivity : AppCompatActivity(),
         scope.launch { viewModel.removeOrAddFavour(item, position) }
     }
 
-    override fun defer(item: NewItem, position: Int) {
-        DateTimeDialog.newInstance().setFragmentResultListener()
-            .show(supportFragmentManager, DateTimeDialog.TAG)
-
-        //scope.launch { viewModel.removeOrAddDeferred(item, position) }
+    override fun defer(item: NewItem, position: Int, dateTime: String) {
+        scope.launch { viewModel.removeOrAddDeferred(item, position, dateTime, applicationContext) }
     }
 
     private fun cancelLiked(){

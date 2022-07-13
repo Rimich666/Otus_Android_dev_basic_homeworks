@@ -15,7 +15,9 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.setFragmentResult
 import com.moviesearch.R
 import com.moviesearch.trace
 import kotlinx.coroutines.*
@@ -198,10 +200,13 @@ class DateTimeDialog : DialogFragment() {
     }
 
     private fun clickOk(){
+        setFragmentResult("selectDate", bundleOf("ok" to true,
+            "dateTime" to selection.dateTime.format(DateTimeFormatter.ISO_DATE_TIME)))
         dismiss()
     }
 
     private fun clickCancel(){
+        setFragmentResult("selectDate", bundleOf("ok" to false))
         dismiss()
     }
 

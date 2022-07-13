@@ -52,7 +52,6 @@ data class Favourite(
     )
 }
 
-
 @Entity(tableName = "pages", indices = [Index("num", unique = true)])
 data class Page(val num: Int){
     @PrimaryKey(autoGenerate = true)

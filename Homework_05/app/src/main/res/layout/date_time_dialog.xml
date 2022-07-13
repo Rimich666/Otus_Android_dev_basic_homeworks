@@ -73,11 +73,11 @@
         />
 
     <Button
-        android:id="@+id/button_ok_date_time"
+        android:id="@+id/button_cancel_date_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/date_picker"
-        app:layout_constraintRight_toLeftOf="@+id/button_cancel_date_time"
+        app:layout_constraintRight_toLeftOf="@+id/button_ok_date_time"
         app:layout_constraintWidth_percent="0.5"
         android:layout_marginHorizontal="10dp"
         android:background="@color/white"
@@ -86,7 +86,7 @@
         android:textSize="20sp"/>
 
     <Button
-        android:id="@+id/button_cancel_date_time"
+        android:id="@+id/button_ok_date_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/date_picker"

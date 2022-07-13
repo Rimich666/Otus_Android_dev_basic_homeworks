@@ -3,12 +3,14 @@ package com.moviesearch.ui.list
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.replace
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.moviesearch.ui.NewItem
 import com.moviesearch.R
 import com.moviesearch.databinding.FragmentListMovieBinding
+import com.moviesearch.trace
 import com.moviesearch.ui.date_time_picker.DateTimeDialog
 import com.moviesearch.viewmodel.MainViewModel
 
@@ -42,6 +45,9 @@ class ListMovieFragment : Fragment() {
         mainModel.deletedItem.observe(this){
             binding.recyclerView.adapter?.notifyItemRemoved(it)
         }
+        /*parentFragmentManager.setFragmentResultListener("selectDate", this) { _, bundle ->
+            if (bundle.getBoolean("ok")) Log.d("datetime", "${trace()} ${bundle.getString("dateTime")}")
+        }*/
     }
 
     override fun onAttach(context: Context) {
@@ -58,6 +64,7 @@ class ListMovieFragment : Fragment() {
         val view = binding.root
         RW = view.findViewById(R.id.recycler_view)
         initRecycler()
+
         return view
     }
 
@@ -115,8 +122,13 @@ class ListMovieFragment : Fragment() {
                 }
 
                 override fun onDeferClick(newsItem: NewItem, position: Int) {
+                    val dialog = DateTimeDialog.newInstance()
+                    parentFragmentManager.setFragmentResultListener("selectDate", this@ListMovieFragment) {
+                            _, bundle ->
+                        if (bundle.getBoolean("ok")) host.defer(newsItem, position, bundle.getString("dateTime")!!)
+                    }
+                    dialog.show(activity!!.supportFragmentManager, DateTimeDialog.TAG)
 
-                    host.defer(newsItem, position)
                 }
 
 
@@ -124,15 +136,10 @@ class ListMovieFragment : Fragment() {
         )
     }
 
-    /*private fun changeLiked(item: NewItem, pos: Int){
-        Log.d("changeLiked","${trace()} item.liked = ${item.liked}")
-        host.likedItem(pos, !item.liked, item)
-    }*/
-
     interface HostList{
         fun showDetail(position: Int)
         fun likedItem(item: NewItem, position: Int)
-        fun defer(item: NewItem, position: Int)
+        fun defer(item: NewItem, position: Int, dateTime: String)
         fun getNext()
         fun getPrevious()
     }

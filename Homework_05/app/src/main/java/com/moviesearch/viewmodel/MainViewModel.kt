@@ -1,9 +1,12 @@
 package com.moviesearch.viewmodel
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.moviesearch.Keys
 import com.moviesearch.ui.NewItem
 import com.moviesearch.ui.start.InitCashItem
@@ -12,9 +15,11 @@ import com.moviesearch.ui.start.StartItem
 import com.moviesearch.datasource.database.Favourite
 import com.moviesearch.repository.Repository
 import com.moviesearch.trace
+import com.moviesearch.workers.DetailWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
+import java.util.concurrent.TimeUnit
 
 const val REQUEST_TITLE = "Запрос страницы"
 
@@ -254,7 +259,15 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
         }
     }
 
-    suspend fun removeOrAddDeferred(item: NewItem, pos: Int){}
+    suspend fun removeOrAddDeferred(item: NewItem, pos: Int, dateTime: String, ctx: Context){
+        Log.d("deferred", "${trace()} remove or add deferred")
+        val workRequest = OneTimeWorkRequestBuilder<DetailWorker>()
+            .setInitialDelay(15, TimeUnit.SECONDS)
+            .build()
+        WorkManager
+            .getInstance(ctx)
+            .enqueue(workRequest)
+    }
 }
 
 class MainViewModelFactory(private val setings: Map<String, *>): ViewModelProvider.Factory{
