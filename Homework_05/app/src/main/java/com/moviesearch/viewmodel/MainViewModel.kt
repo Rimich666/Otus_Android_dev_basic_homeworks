@@ -5,10 +5,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
+import androidx.work.*
 import com.moviesearch.Keys
 import com.moviesearch.WMTAG
 import com.moviesearch.ui.NewItem
@@ -133,8 +130,8 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
         loading = false
     }
 
-    suspend fun initData(){
-        Repository.initData {msg ->
+    suspend fun initData(context: Context){
+        Repository.initData(context) {msg ->
             when{
                 msg[0].containsKey(Keys.max) -> {
                     val item = requestedItems.value!![requestedItems.value!!.size - 1] as StartItem.InitCash
@@ -190,28 +187,30 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
 
                 }
                 msg[0].containsKey(Keys.favour) -> setFavour(msg[0][Keys.favour] as MutableList<Favourite>)
+                msg[0].containsKey(Keys.deferred)->setDeferred(msg[0][Keys.deferred] as List<WorkInfo>)
             }
         }
+
+    }
+
+    private fun setDeferred(def: List<WorkInfo>){
+        def.forEach{Log.d(WMTAG,"${trace()} $it")}
     }
 
     private fun setFavour(fav: MutableList<Favourite>){
-        fav.forEach{favourites.value?.add(NewItem(it))}
+        fav.forEach{ favourites.value?.add(NewItem(it)) }
     }
 
     suspend fun cancelLiked(){
-        Log.d("cancelLiked", "${trace()} remove or add favourite")
-        Log.d("cancelLiked", "${trace()} removeFavourite = ${removeFavourite.value}")
         val item = forCancel.value!!
         val liked = !item.liked
         val result: Boolean =
             if (liked) Repository.like(item)
             else Repository.dislike(item)
-        Log.d("cancelLiked", "${trace()} result = $result")
         if (result){
             if (changeItem.value!! > -1){
                 withContext(Dispatchers.Main){
                     items.value!![changeItem.value!!].liked = liked
-                    Log.d("cancelLiked", "${trace()} changeItem = ${changeItem.value}")
                     changeItem.value = changeItem.value
                 }
             }
@@ -223,7 +222,6 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
             }
             else favourites.value!!.remove(item)
         }
-//        Log.d("changeLiked","${trace()} сдушалка")
     }
 
     suspend fun dislike(itemFav: NewItem, posFav: Int){
@@ -246,7 +244,6 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
 
 
     suspend fun removeOrAddFavour(item: NewItem, pos: Int){
-        Log.d("changeLiked", "${trace()} remove or add favourite")
         val liked = !item.liked
         val result: Boolean =
         if (liked) Repository.like(item)
@@ -268,13 +265,13 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
     }
 
     suspend fun addDeferred(item: NewItem, pos: Int, dateTime: String, ctx: Context){
-        Log.d("deferred", "${trace()} remove or add deferred")
         val now = LocalDateTime.now()
         val alarm = LocalDateTime.parse(dateTime)
         val interval = if (alarm > now) Duration.between(now, alarm).toMinutes()
                     else 1
         item.deferred = true
         item.deferDateTime = dateTime
+        Log.d(WMTAG, "${trace()} ${item.workData()}")
         val workRequest = OneTimeWorkRequestBuilder<DetailWorker>()
             .setInitialDelay(interval, TimeUnit.MINUTES)
             .addTag(WMTAG)
@@ -283,7 +280,7 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
         WorkManager
             .getInstance(ctx)
             .enqueueUniqueWork(item.idKp.toString(), ExistingWorkPolicy.REPLACE, workRequest)
-
+        Log.d(WMTAG, "${trace()} ${workRequest.id}")
         deferredFilms.value!!.add(item.copy())
         withContext(Dispatchers.Main){changeItem.value = pos}
     }

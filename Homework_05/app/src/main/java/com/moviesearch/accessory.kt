@@ -21,9 +21,8 @@ object Keys{
 
     const val pages = "pages"
     const val favour = "favour"
+    const val deferred = "deferred"
     const val max = "max"
 
     const val progress = "progress"
-
-
 }

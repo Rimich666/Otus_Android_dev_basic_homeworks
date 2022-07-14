@@ -1,8 +1,15 @@
 package com.moviesearch.repository
 
+import android.content.Context
 import android.util.Log
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import androidx.work.await
+import com.google.common.util.concurrent.ListenableFuture
 import com.moviesearch.App.Companion.db
 import com.moviesearch.Keys
+import com.moviesearch.Keys.progress
+import com.moviesearch.WMTAG
 import com.moviesearch.ui.NewItem
 import com.moviesearch.datasource.database.Favourite
 import com.moviesearch.datasource.database.Film
@@ -40,7 +47,9 @@ object Repository {
     private var currentPage: Int = 1
     private var pages: MutableList<Int>? = null
 
-    suspend fun initData(progress: (msg: MutableList<MutableMap<String,Any>>)->Unit) = coroutineScope{
+    suspend fun initData(context: Context,
+                         progress: (msg: MutableList<MutableMap<String,Any>>)->Unit) =
+        coroutineScope{
         var replay: Boolean = true
         if (pages == null){
             replay = false
@@ -92,10 +101,11 @@ object Repository {
             }
         }
         if (!replay){
+            val workManager = WorkManager.getInstance(context)
             val favour: Deferred<MutableList<Favourite>> = async{ db?.filmDao()?.getFavourites()!!}
             progress(mutableListOf(mutableMapOf(Keys.favour to favour.await())))
+            progress(mutableListOf(mutableMapOf(Keys.deferred to workManager.getWorkInfosByTag(WMTAG).await())))
         }
-
     }
 
     suspend fun getDetails(id: Int, takeDetails: (msg: String)->Unit) = coroutineScope{

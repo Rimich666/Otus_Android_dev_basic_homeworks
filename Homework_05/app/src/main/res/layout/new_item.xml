@@ -21,7 +21,7 @@
 
         <com.google.android.material.imageview.ShapeableImageView
             app:layout_constraintWidth_default="percent"
-            android:id="@+id/image_defer"
+            android:id="@+id/image"
             android:layout_width="0dp"
             app:layout_constraintWidth_percent="0.25"
             android:layout_height="0dp"
@@ -33,11 +33,11 @@
             tools:src="@sample/pictures" />
 
         <TextView
-            android:id="@+id/text_name_defer"
+            android:id="@+id/text_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintRight_toLeftOf="@id/heart_image"
-            app:layout_constraintLeft_toRightOf="@+id/image_defer"
+            app:layout_constraintLeft_toRightOf="@+id/image"
             app:layout_constraintTop_toTopOf="parent"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -48,14 +48,14 @@
             />
 
         <TextView
-            android:id="@+id/text_short_description_defer"
+            android:id="@+id/text_short_description"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="@id/text_name_defer"
+            app:layout_constraintLeft_toLeftOf="@id/text_name"
             app:layout_constraintHeight_default="percent"
             app:layout_constraintHeight_percent="0.3"
-            app:layout_constraintRight_toRightOf="@+id/text_name_defer"
-            app:layout_constraintTop_toBottomOf="@+id/text_name_defer"
+            app:layout_constraintRight_toRightOf="@+id/text_name"
+            app:layout_constraintTop_toBottomOf="@+id/text_name"
             android:paddingStart="10dp"
             android:textSize="14sp"
             android:textColor="@color/black"

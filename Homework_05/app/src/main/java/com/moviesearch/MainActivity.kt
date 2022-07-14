@@ -20,6 +20,7 @@ import com.moviesearch.ui.favourites.FavouritesFragment
 import com.moviesearch.ui.list.ListMovieFragment
 import com.moviesearch.databinding.ActivityMainBinding
 import com.moviesearch.repository.Repository
+import com.moviesearch.ui.deferred.DeferredFilmsFragment
 import com.moviesearch.viewmodel.MainViewModel
 import com.moviesearch.viewmodel.MainViewModelFactory
 import kotlinx.coroutines.*
@@ -33,7 +34,6 @@ class MainActivity : AppCompatActivity(),
     private lateinit var viewModel: MainViewModel
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModelFactory: MainViewModelFactory
-    //private val repository = $Repository
     private val scope = CoroutineScope(Dispatchers.Default)
     private var setings: Map<String,*> = mapOf(
         "firstStart" to true,
@@ -52,12 +52,13 @@ class MainActivity : AppCompatActivity(),
         viewModel.forCancel.observe(this){ showCancel() }
         viewModel.responseComplete.observe(this){
             if (!viewModel.responseComplete.value!!){ showRepeat() }
-
         }
-        viewModel.atAll.observe(this){ if(it) inflateFragment["list"]?.let { it() }}
+        viewModel.atAll.observe(this){
+            if(it) inflateFragment["list"]?.let { it() }
+        }
         if (viewModel.firstStart){
             scope.launch {
-                viewModel.initData()
+                viewModel.initData(applicationContext)
             }
             viewModel.firstStart = false
         }
@@ -97,7 +98,7 @@ class MainActivity : AppCompatActivity(),
                     .replace(R.id.container, DetailFragment.newInstance())
                     .commit()},
         "defr" to {supportFragmentManager.beginTransaction()
-            .replace(R.id.container, DetailFragment.newInstance())
+            .replace(R.id.container, DeferredFilmsFragment.newInstance())
             .commit()}
     )
 
@@ -178,7 +179,7 @@ class MainActivity : AppCompatActivity(),
             "Не все страницы были успешно загружены",
             Snackbar.LENGTH_LONG
         )
-        zakus.setAction("Повторить?") { scope.launch { viewModel.initData() }}
+        zakus.setAction("Повторить?") { scope.launch { viewModel.initData(applicationContext) }}
         zakus.addCallback(object : Snackbar.Callback(){
             override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                 when(event){

@@ -67,13 +67,13 @@ data class NewItem(
         false,
         ""
     )
-    fun workData() = run { workDataOf(
+    fun workData() = workDataOf(
         "name" to name,
         "altName" to altName,
         "description" to description,
         "pictures" to pictures,
         "dateTime" to deferDateTime
-    )}
+    )
 
     fun copy(): NewItem = NewItem(
         idKp, name, altName, description, pictures, poster, Selected, liked, deferred, deferDateTime)
