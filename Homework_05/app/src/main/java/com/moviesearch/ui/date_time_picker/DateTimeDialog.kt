@@ -15,16 +15,16 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.input.key.Key.Companion.Period
 import androidx.core.os.bundleOf
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import com.moviesearch.R
 import com.moviesearch.databinding.DateTimeDialogBinding
 import com.moviesearch.trace
 import kotlinx.coroutines.*
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
+import java.time.*
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -35,10 +35,11 @@ class SelectedDateTime(){
     var date: LocalDate = LocalDate.now()
     var time: LocalTime = LocalTime.of(0,0,0)
     lateinit var dateTime: LocalDateTime
+    var interval: Long = 0
     var dateColor = R.color.red
     var timeColor = R.color.red
     fun setDate(year: Int, month: Int, day: Int){
-        date = LocalDate.of(year, month + 1, day)
+        date = LocalDate.of(year, month, day)
         setDateTime()
         dateColor = R.color.green
         dateSelected = true
@@ -58,6 +59,7 @@ class SelectedDateTime(){
     private fun setDateTime(){
         dateTime = LocalDateTime.of(date, time)
     }
+
     fun dateStr():String{
         return date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
     }
@@ -86,7 +88,9 @@ class DateTimeDialog : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         Log.d("datetime", "${trace()} $container")
-        val view = inflater.inflate(R.layout.date_time_dialog, container, false)
+        //val view = inflater.inflate(R.layout.date_time_dialog, container, false)
+        binding = DataBindingUtil.inflate(inflater,R.layout.date_time_dialog, container, false)
+        val view = binding.root
         binding.buttonOkDateTime.setOnClickListener{ clickOk() }
         binding.buttonCancelDateTime.setOnClickListener{ clickCancel() }
         binding.textDate.setOnClickListener { datePickerShow() }
@@ -95,7 +99,7 @@ class DateTimeDialog : DialogFragment() {
         xodiki.start()
         pulsar = scope.launch { pulsar() }
         pulsar.start()
-        currentView = image
+        currentView = binding.imageClockAlarm
 
         binding.datePicker.setOnDateChangedListener{ _, year, month, day -> dateChanged(year, month, day)}
         binding.timePicker.setOnTimeChangedListener{ _, hour, minute -> timeChanged(hour, minute) }

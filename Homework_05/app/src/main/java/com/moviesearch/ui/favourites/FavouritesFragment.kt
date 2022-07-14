@@ -43,16 +43,15 @@ class FavouritesFragment : Fragment() {
         return view
     }
 
-
-
     private fun initRecycler(){
-        binding.recyclerFavor.adapter = FavoriteItemsAdapter(favourites, object: FavoriteItemsAdapter.FavoritesClickListener
-        {
-            override fun onHeartClick(item: NewItem, position: Int) {
-                host.dislike(item, position)
-//                rWF.adapter?.notifyItemRemoved(position)
+        binding.recyclerFavor.adapter = FavoriteItemsAdapter(
+            favourites, object: FavoriteItemsAdapter.FavoritesClickListener
+            {
+                override fun onHeartClick(item: NewItem, position: Int) {
+                    host.dislike(item, position)
+                }
             }
-        } )
+        )
     }
 
     companion object {

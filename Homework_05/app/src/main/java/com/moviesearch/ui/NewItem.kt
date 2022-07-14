@@ -13,7 +13,8 @@ data class NewItem(
     var poster: String ,
     var Selected: Boolean,
     var liked: Boolean,
-    var deferred: Boolean
+    var deferred: Boolean,
+    var deferDateTime: String
 )
 {
     constructor(itmap:Map<String,String>, Selected: Boolean, liked: Boolean):this(
@@ -25,7 +26,9 @@ data class NewItem(
         itmap["poster"] as String,
         Selected,
         liked,
-    false)
+        false,
+        ""
+    )
 
     constructor(itemMap: MutableMap<*, *>):this(
         itemMap["id"] as Int,
@@ -36,7 +39,8 @@ data class NewItem(
         itemMap["poster"] as String,
         false,
         itemMap["licked"] as Boolean,
-        false
+        false,
+        ""
     )
 
     constructor(rec: Favourite): this(
@@ -48,7 +52,8 @@ data class NewItem(
         "",
         false,
         true,
-        false
+        false,
+        ""
     )
     constructor(rec: Film, liked: Boolean): this(
         rec.idKp,
@@ -59,13 +64,17 @@ data class NewItem(
         "",
         false,
         liked,
-        false
+        false,
+        ""
     )
-    fun workData(dateTime: String) = run { workDataOf(
+    fun workData() = run { workDataOf(
         "name" to name,
         "altName" to altName,
         "description" to description,
         "pictures" to pictures,
-        "dateTime" to dateTime
+        "dateTime" to deferDateTime
     )}
+
+    fun copy(): NewItem = NewItem(
+        idKp, name, altName, description, pictures, poster, Selected, liked, deferred, deferDateTime)
 }

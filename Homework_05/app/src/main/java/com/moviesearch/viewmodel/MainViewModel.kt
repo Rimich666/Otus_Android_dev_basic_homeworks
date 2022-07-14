@@ -22,6 +22,8 @@ import com.moviesearch.workers.DetailWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
+import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
 import java.util.concurrent.TimeUnit
@@ -35,6 +37,7 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
     var detailsText: String = ""
     var items: MutableLiveData<MutableList<NewItem>> = MutableLiveData(mutableListOf())
     var favourites: MutableLiveData<MutableList<NewItem>> = MutableLiveData(mutableListOf())
+    var deferredFilms: MutableLiveData<MutableList<NewItem>> = MutableLiveData(mutableListOf())
 
     var changeItem: MutableLiveData<Int> = MutableLiveData(-1)
     var insertFavourite: MutableLiveData<Int> = MutableLiveData(-1)
@@ -266,16 +269,22 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
 
     suspend fun addDeferred(item: NewItem, pos: Int, dateTime: String, ctx: Context){
         Log.d("deferred", "${trace()} remove or add deferred")
-
+        val now = LocalDateTime.now()
+        val alarm = LocalDateTime.parse(dateTime)
+        val interval = if (alarm > now) Duration.between(now, alarm).toMinutes()
+                    else 1
+        item.deferred = true
+        item.deferDateTime = dateTime
         val workRequest = OneTimeWorkRequestBuilder<DetailWorker>()
-            .setInitialDelay(15, TimeUnit.SECONDS)
+            .setInitialDelay(interval, TimeUnit.MINUTES)
             .addTag(WMTAG)
-            .setInputData(item.workData(dateTime))
+            .setInputData(item.workData())
             .build()
         WorkManager
             .getInstance(ctx)
             .enqueueUniqueWork(item.idKp.toString(), ExistingWorkPolicy.REPLACE, workRequest)
-        item.deferred = true
+
+        deferredFilms.value!!.add(item.copy())
         withContext(Dispatchers.Main){changeItem.value = pos}
     }
 }

@@ -12,7 +12,9 @@ class FavoriteItemsAdapter (
     private  val items: List<NewItem>,
     private val listener: FavoritesClickListener
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+
     lateinit var binding: FavItemBinding
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         binding = DataBindingUtil.inflate(inflater, R.layout.fav_item, parent, false)

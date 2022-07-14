@@ -42,7 +42,6 @@ class NewItemsViewHolder(private val binding: NewItemBinding) : RecyclerView.Vie
             .load(item.pictures)
             .into(binding.image)
 
-        binding.buttonDetail.setOnClickListener { listener.onDetailClick(item, absoluteAdapterPosition) }
         itemView.setOnLongClickListener{ listener.onItemLongClick(item, absoluteAdapterPosition) }
         binding.detailImage.setOnClickListener{ listener.onDetailClick(item, absoluteAdapterPosition) }
         binding.heartImage.setOnClickListener{ listener.onHeartClick(item, absoluteAdapterPosition) }

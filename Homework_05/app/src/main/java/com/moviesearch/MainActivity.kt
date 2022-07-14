@@ -55,10 +55,8 @@ class MainActivity : AppCompatActivity(),
 
         }
         viewModel.atAll.observe(this){ if(it) inflateFragment["list"]?.let { it() }}
-        Log.d("MainActivity.OnCreate", "${viewModel.firstStart}")
         if (viewModel.firstStart){
             scope.launch {
-                //viewModel.initData{complete -> if(complete) inflateFragment["list"]?.let { it() }}
                 viewModel.initData()
             }
             viewModel.firstStart = false
@@ -97,8 +95,10 @@ class MainActivity : AppCompatActivity(),
                     .commit()},
         "detl" to {supportFragmentManager.beginTransaction()
                     .replace(R.id.container, DetailFragment.newInstance())
-                    .commit()}
-
+                    .commit()},
+        "defr" to {supportFragmentManager.beginTransaction()
+            .replace(R.id.container, DetailFragment.newInstance())
+            .commit()}
     )
 
     private fun itemSelected (mI: MenuItem): Boolean
@@ -110,6 +110,10 @@ class MainActivity : AppCompatActivity(),
             }
             R.id.navigation_favorites -> {
                 inflateFragment["favr"]?.let { it() }
+                return true
+            }
+            R.id.navigation_deferred ->{
+                inflateFragment["defr"]?.let { it() }
                 return true
             }
             R.id.navigation_notifications -> {
