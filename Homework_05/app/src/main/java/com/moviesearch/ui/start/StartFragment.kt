@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
+import com.moviesearch.Frags
 import com.moviesearch.R
 import com.moviesearch.databinding.FragmentStartBinding
 import com.moviesearch.viewmodel.MainViewModel
@@ -20,7 +21,7 @@ class StartFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
-        mainModel.currFragment = "start"
+        mainModel.currFragment = Frags.START
         items = mainModel.requestedItems.value!!
         mainModel.requestedItemChanged.observe(this){binding.recyclerStart.adapter!!.notifyItemChanged(it)}
         mainModel.requestedInserted.observe(this){

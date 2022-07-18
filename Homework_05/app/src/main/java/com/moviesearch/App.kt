@@ -1,39 +1,29 @@
 package com.moviesearch
 
 import android.app.Application
+import android.app.NotificationManager
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.core.app.NotificationManagerCompat
 import com.moviesearch.datasource.database.DbObject
 import com.moviesearch.datasource.database.FilmDb
-import com.moviesearch.datasource.remotedata.LoadData
+import com.moviesearch.workers.Notification
 import java.util.concurrent.Executors
 
 class App: Application() {
-    private var app: Application = this
-
-    /*fun getApp(): Application{
-        Log.d("TraceOfBase", "Таки запросил app ${app.toString()}")
-        return app
-    }*/
-
     override fun onCreate() {
         super<Application>.onCreate()
-        app = this
-        Log.d("lifecycle", "А это Апп ${app.toString()}")
-        Executors.newSingleThreadExecutor().execute(
-            Runnable{
-                db = DbObject.getDatabase(this.applicationContext)
-                Log.d("TraceOfBase", "А при старте что? ${db.toString()}")
-            }
-        )
+        appContext = applicationContext
+        Executors.newSingleThreadExecutor().execute {
+            db = DbObject.getDatabase(appContext)
+            Log.d("TraceOfBase", "А при старте что? ${db.toString()}")
+        }
+        Notification.createNotificationChanel()
     }
 
     companion object{
         var db: FilmDb? = null
-        fun getDatabase(): FilmDb? {
-            Log.d("TraceOfBase", "Таки запросил ${db.toString()}")
-            return db
-        }
+        lateinit var appContext: Context
+
     }
 }

@@ -3,6 +3,8 @@ package com.moviesearch
 import android.util.Log
 
 const val WMTAG = "postViewing"
+const val REQUEST_TITLE = "Запрос страницы"
+const val NOTIFICATION_CHANNEL_DESCRIPTION = "App notification channel"
 
 fun trace(): String{
     return "${Throwable().stackTrace[1].fileName}: ${Throwable().stackTrace[1].lineNumber}: "

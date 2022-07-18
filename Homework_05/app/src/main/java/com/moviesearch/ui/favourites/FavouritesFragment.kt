@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import com.moviesearch.Frags
 import com.moviesearch.ui.NewItem
 import com.moviesearch.R
 import com.moviesearch.databinding.FragmentFavouritesBinding
@@ -22,7 +23,7 @@ class FavouritesFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
-        mainModel.currFragment = "favr"
+        mainModel.currFragment = Frags.FAVOR
         favourites = mainModel.favourites.value!!
         mainModel.removeFavourite.observe(this){binding.recyclerFavor.adapter?.notifyItemRemoved(it)}
         mainModel.insertFavourite.observe(this){binding.recyclerFavor.adapter?.notifyItemInserted(it)}

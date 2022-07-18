@@ -3,9 +3,6 @@ package com.moviesearch.ui.list
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.moviesearch.ui.NewItem
 import com.moviesearch.R
@@ -17,7 +14,7 @@ class NewItemsViewHolder(private val binding: NewItemBinding) : RecyclerView.Vie
     fun bind(item: NewItem, listener: NewItemsAdapter.DetailClickListener){
         val cont = binding.root.context
         val fontColor =
-            if(item.Selected)
+            if(item.selected)
                 cont.resources.getColor(R.color.font_sel_item, cont.theme)
             else
                 cont.resources.getColor(R.color.black, cont.theme)

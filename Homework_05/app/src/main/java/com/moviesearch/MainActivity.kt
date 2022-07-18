@@ -1,13 +1,17 @@
 //aasfasf safasf        moviesearch-dfb58
 package com.moviesearch
 
+import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.replace
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 
 
@@ -26,95 +30,130 @@ import com.moviesearch.viewmodel.MainViewModelFactory
 import kotlinx.coroutines.*
 import kotlin.system.exitProcess
 
+enum class Frags{LIST {
+    override var list: MutableList<NewItem>? = null
+    override var inst: (() -> Fragment) = { ListMovieFragment.newInstance() }
+    override var inflater: () -> Any = {}
+    override fun antonymDefr(): Frags = DEFER
+}, FAVOR {
+    override var list: MutableList<NewItem>? = null
+    override var inst: () -> Fragment = { FavouritesFragment.newInstance() }
+    override var inflater: () -> Any = {}
+    override fun antonymDefr(): Frags = FAVOR
+}, START {
+    override var list: MutableList<NewItem>? = null
+    override var inst: () -> Fragment = { StartFragment.newInstance() }
+    override var inflater: () -> Any = {}
+    override fun antonymDefr(): Frags = START
+}, DEFER {
+    override var list: MutableList<NewItem>? = null
+    override var inst: () -> Fragment = { DeferredFilmsFragment.newInstance() }
+    override var inflater: () -> Any = {}
+    override fun antonymDefr(): Frags = LIST
+}, DETLS {
+    override var list: MutableList<NewItem>? = null
+    override var inst: () -> Fragment = { DetailFragment.newInstance() }
+    override var inflater: () -> Any = {}
+    override fun antonymDefr(): Frags = DETLS
+};
+    abstract var list: MutableList<NewItem>?
+    abstract var inflater: () -> Any
+    abstract var inst: () -> Fragment
+    abstract fun antonymDefr(): Frags
+}
 
 class MainActivity : AppCompatActivity(),
-    ListMovieFragment.HostList, FavouritesFragment.Host {
+    ListMovieFragment.HostList, FavouritesFragment.Host, DeferredFilmsFragment.HostDefer {
 
-    private lateinit var items: MutableList<NewItem>
     private lateinit var viewModel: MainViewModel
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModelFactory: MainViewModelFactory
     private val scope = CoroutineScope(Dispatchers.Default)
-    private var setings: Map<String,*> = mapOf(
-        "firstStart" to true,
-        "startFragment" to "start",
-        "progress" to 0,
-        "selectedPosition" to -1
-    )
+    object Settings{
+        var firstStart = true
+        var startFragment = Frags.START
+        var progress = 0
+        var selectedPosition = -1
+        lateinit var owner: LifecycleOwner
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        Settings.owner = this
+        val idKp = intent.getIntExtra("idKp", -1)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        viewModelFactory = MainViewModelFactory(setings)
+        viewModelFactory = MainViewModelFactory(Settings)
         viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
-        items = viewModel.items.value!!
-        viewModel.forCancel.observe(this){ showCancel() }
-        viewModel.responseComplete.observe(this){
-            if (!viewModel.responseComplete.value!!){ showRepeat() }
+        Frags.LIST.list = viewModel.items.value
+        Frags.FAVOR.list = viewModel.favourites.value
+        Frags.DEFER.list = viewModel.deferredFilms.value
+        Frags.values().forEach { frg ->
+            frg.inflater = {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.container, frg.inst() )
+                    .commit()
+             }
         }
-        viewModel.atAll.observe(this){
-            if(it) inflateFragment["list"]?.let { it() }
-        }
-        if (viewModel.firstStart){
-            scope.launch {
-                viewModel.initData(applicationContext)
-            }
-            viewModel.firstStart = false
-        }
+        Frags.LIST.inflater = {supportFragmentManager.beginTransaction()
+            .replace(R.id.container, ListMovieFragment.newInstance())
+            .commit()}
         setContentView(R.layout.activity_main)
-        val navView = findViewById<BottomNavigationView>(R.id.nav_view)
-        navView.setOnItemSelectedListener { itemSelected(it) }
-        inflateFragment[viewModel.currFragment]?.let { it() }
-    }
+        if (idKp == -1){
+            viewModel.forCancel.observe(this){ showCancel() }
+            viewModel.responseComplete.observe(this){
+                if (!viewModel.responseComplete.value!!){ showRepeat() }
+            }
+            viewModel.atAll.observe(this){
+                if(it) Frags.LIST.inflater()
+            }
+
+            if (viewModel.firstStart){
+                scope.launch {
+                    viewModel.initData()
+                }
+                viewModel.firstStart = false
+            }
+
+            scope.launch { viewModel.observationOfWorks() }
+
+            val navView = findViewById<BottomNavigationView>(R.id.nav_view)
+            navView.setOnItemSelectedListener { itemSelected(it) }
+            viewModel.currFragment.inflater()
+        }
+        else{
+            scope.launch {
+                viewModel.getDetails(idKp, Frags.DETLS.inflater)
+            }
+        }
+     }
 
     override fun showDetail(position:Int){
-        if (viewModel.selectedPosition > -1){ viewModel.items.value!![viewModel.selectedPosition].Selected = false }
+        if (viewModel.selectedPosition > -1){ viewModel.items.value!![viewModel.selectedPosition].selected = false }
         viewModel.selectedPosition = position
         val item = viewModel.items.value!![position]
-        item.Selected = true
+        item.selected = true
         scope.launch {
-            Repository.getDetails(item.idKp, tkDet)
+            viewModel.getDetails(item.idKp, Frags.DETLS.inflater)
         }
     }
 
-    private fun takeDetails(msg: String){
+    /*private val takeDetails: (msg: String) -> Unit = { msg ->
         viewModel.detailsText = msg
-        inflateFragment["detl"]?.let { it() }
-    }
-    private val tkDet: (msg: String) -> Unit = ::takeDetails
-
-    private val inflateFragment: MutableMap<String, ()->Any> = mutableMapOf(
-        "start" to {supportFragmentManager.beginTransaction()
-            .replace(R.id.container, StartFragment.newInstance())
-            .commit()},
-        "list" to {supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, ListMovieFragment.newInstance())
-                    .commit()},
-        "favr" to {supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, FavouritesFragment.newInstance())
-                    .commit()},
-        "detl" to {supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, DetailFragment.newInstance())
-                    .commit()},
-        "defr" to {supportFragmentManager.beginTransaction()
-            .replace(R.id.container, DeferredFilmsFragment.newInstance())
-            .commit()}
-    )
+        Frags.DETLS.inflater()}*/
 
     private fun itemSelected (mI: MenuItem): Boolean
     {
         when (mI.itemId) {
             R.id.navigation_list -> {
-                inflateFragment["list"]?.let { it() }
+                Frags.LIST.inflater()
                 return true
             }
             R.id.navigation_favorites -> {
-                inflateFragment["favr"]?.let { it() }
+                Frags.FAVOR.inflater()
                 return true
             }
             R.id.navigation_deferred ->{
-                inflateFragment["defr"]?.let { it() }
+                Frags.DEFER.inflater()
                 return true
             }
             R.id.navigation_notifications -> {
@@ -154,7 +193,11 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun defer(item: NewItem, position: Int, dateTime: String) {
-        scope.launch { viewModel.addDeferred(item, position, dateTime, applicationContext) }
+        scope.launch { viewModel.addDeferred(item, position, dateTime) }
+    }
+
+    override fun undefer(item: NewItem, position: Int) {
+        scope.launch { viewModel.cancelWork(item, position) }
     }
 
     private fun cancelLiked(){
@@ -179,7 +222,7 @@ class MainActivity : AppCompatActivity(),
             "Не все страницы были успешно загружены",
             Snackbar.LENGTH_LONG
         )
-        zakus.setAction("Повторить?") { scope.launch { viewModel.initData(applicationContext) }}
+        zakus.setAction("Повторить?") { scope.launch { viewModel.initData() }}
         zakus.addCallback(object : Snackbar.Callback(){
             override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                 when(event){
@@ -190,4 +233,3 @@ class MainActivity : AppCompatActivity(),
         zakus.show()
     }
 }
-

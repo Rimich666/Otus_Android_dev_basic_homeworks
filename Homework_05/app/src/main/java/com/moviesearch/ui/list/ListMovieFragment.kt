@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.moviesearch.Frags
 
 import com.moviesearch.ui.NewItem
 import com.moviesearch.R
@@ -34,7 +35,7 @@ class ListMovieFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
-        mainModel.currFragment = "list"
+        mainModel.currFragment = Frags.LIST
         items = mainModel.items.value!!
         mainModel.changeItem.observe(this){
             binding.recyclerView.adapter?.notifyItemChanged(it)

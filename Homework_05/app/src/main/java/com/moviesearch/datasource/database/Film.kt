@@ -60,11 +60,12 @@ data class Page(val num: Int){
 
 @Entity(
     tableName = "deferred_films",
-    indices = [Index("id_kp", unique = true)]
+    indices = [Index("id_kp", unique = true), Index("id_work", unique = true)]
 )
 data class DeferredFilm(
     val name: String,
     @ColumnInfo(name = "date_time") val dateTime: String,
+    @ColumnInfo(name = "id_work") val idWork: String,
     @ColumnInfo(name = "id_kp") val idKp: Int,
     @ColumnInfo(name = "short_description") val shortDescription: String,
     @ColumnInfo(name = "preview_url") val previewUrl: String,
@@ -72,4 +73,13 @@ data class DeferredFilm(
 ){
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
+    constructor(item: NewItem): this(
+        item.name,
+        item.deferDateTime,
+        item.idWork,
+        item.idKp,
+        item.description,
+        item.pictures,
+        item.altName
+    )
 }

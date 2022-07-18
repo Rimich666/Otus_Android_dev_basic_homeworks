@@ -22,13 +22,14 @@ interface FilmDao {
     @Query("SELECT id FROM favourites WHERE id_kp = :idKp LIMIT 1")
     fun getLiked(idKp: Int): Long
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertDeferred(film: DeferredFilm): Long
     @Query("SELECT * FROM deferred_films")
     fun getDeferred(): MutableList<DeferredFilm>
     @Query("DELETE FROM deferred_films WHERE id_kp = :idKp")
     fun deleteDeferred(idKp: Int): Int
-
+    @Query("SELECT * FROM deferred_films WHERE id_work = :idWork LIMIT 1")
+    fun getDeferredByIdWork(idWork: String): DeferredFilm
 
     @Query("SELECT * FROM list_films WHERE list_films.page_id = :pageId")
     fun getPageFilms(pageId: Long): MutableList<Film>

@@ -1,36 +1,32 @@
 package com.moviesearch.viewmodel
 
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.work.*
-import com.moviesearch.Keys
-import com.moviesearch.WMTAG
+import com.moviesearch.*
+import com.moviesearch.App.Companion.appContext
 import com.moviesearch.ui.NewItem
 import com.moviesearch.ui.start.InitCashItem
 import com.moviesearch.ui.start.RequestedItem
 import com.moviesearch.ui.start.StartItem
 import com.moviesearch.datasource.database.Favourite
 import com.moviesearch.repository.Repository
-import com.moviesearch.trace
 import com.moviesearch.workers.DetailWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
 import java.time.Duration
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.Period
+import java.util.*
 import java.util.concurrent.TimeUnit
 
-const val REQUEST_TITLE = "Запрос страницы"
-
-class MainViewModel(settings: Map<String, *>): ViewModel() {
-    var currFragment = settings["startFragment"] as String
-    var firstStart: Boolean = settings["firstStart"] as Boolean
-    var selectedPosition: Int = settings["selectedPosition"] as Int
+class MainViewModel(settings: MainActivity.Settings): ViewModel() {
+    var currFragment = settings.startFragment
+    var firstStart: Boolean = settings.firstStart
+    var selectedPosition: Int = settings.selectedPosition
+    private val mainLifeCycleOwner = settings.owner
     var detailsText: String = ""
     var items: MutableLiveData<MutableList<NewItem>> = MutableLiveData(mutableListOf())
     var favourites: MutableLiveData<MutableList<NewItem>> = MutableLiveData(mutableListOf())
@@ -39,6 +35,8 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
     var changeItem: MutableLiveData<Int> = MutableLiveData(-1)
     var insertFavourite: MutableLiveData<Int> = MutableLiveData(-1)
     var removeFavourite: MutableLiveData<Int> = MutableLiveData(-1)
+    var changeDeferred: MutableLiveData<Int> = MutableLiveData(-1)
+    var deletedDeferred: MutableLiveData<Int> = MutableLiveData(-1)
     var forCancel: MutableLiveData<NewItem> = MutableLiveData()
 
     var loading: Boolean = false
@@ -66,6 +64,9 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
 
     var responseComplete: MutableLiveData<Boolean> = MutableLiveData(true)
     var atAll: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    private val workManager by lazy { WorkManager.getInstance(appContext) }
+
 
     private suspend fun deletePage(page: Page){
         withContext(Dispatchers.Main) {
@@ -130,8 +131,8 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
         loading = false
     }
 
-    suspend fun initData(context: Context){
-        Repository.initData(context) {msg ->
+    suspend fun initData(){
+        Repository.initData {msg ->
             when{
                 msg[0].containsKey(Keys.max) -> {
                     val item = requestedItems.value!![requestedItems.value!!.size - 1] as StartItem.InitCash
@@ -179,22 +180,23 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
 
                     for (i in 1 until msg.size){
                         favourites.value?.indexOfFirst { item -> item.idKp == msg[i]["id"] as Int}
-                        msg[i]["licked"] = (favourites.value?.indexOfFirst { item -> item.idKp == msg[i]["id"] as Int}!! > -1)
+                        msg[i]["licked"] = favourites.value!!.indexOfFirst { item -> item.idKp == msg[i]["id"] as Int }!! > -1
+                        msg[i]["deferred"] = deferredFilms.value!!.indexOfFirst { item -> item.idKp == msg[i]["id"] as Int } > -1
                         items.value?.add(NewItem(msg[i] as MutableMap<*, *>))
-                        Log.d("start", "${trace()} ${msg[i]}")
                     }
                     centP = Page(0, items.value?.size!! - 1, 1, items.value?.size!!)
 
                 }
                 msg[0].containsKey(Keys.favour) -> setFavour(msg[0][Keys.favour] as MutableList<Favourite>)
-                msg[0].containsKey(Keys.deferred)->setDeferred(msg[0][Keys.deferred] as List<WorkInfo>)
             }
         }
-
     }
 
-    private fun setDeferred(def: List<WorkInfo>){
-        def.forEach{Log.d(WMTAG,"${trace()} $it")}
+    suspend fun getDetails(idKp:Int, infl: () -> Any ){
+        Repository.getDetails(idKp) { msg ->
+            detailsText = msg
+            infl()
+        }
     }
 
     private fun setFavour(fav: MutableList<Favourite>){
@@ -264,32 +266,130 @@ class MainViewModel(settings: Map<String, *>): ViewModel() {
         }
     }
 
-    suspend fun addDeferred(item: NewItem, pos: Int, dateTime: String, ctx: Context){
+    private suspend fun observationOfWork(id: UUID){
+        val liveWork = workManager.getWorkInfoByIdLiveData(id)
+        withContext(Dispatchers.Main){
+            liveWork.observe(mainLifeCycleOwner){ work ->
+                if (work == null) return@observe
+                Log.d(WMTAG, "${trace()} подписка на работу $work")
+                if (work.state != WorkInfo.State.ENQUEUED) {
+                    var pos = items.value!!.indexOfFirst { item -> item.idWork == work.id.toString()}
+                    if (pos > -1) {
+                        Log.d(WMTAG, "${trace()} ${work.state} надо чё то менять")
+                        items.value!![pos].apply {
+                            idWork = ""
+                            deferDateTime = ""
+                            deferred = false
+                        }
+                        changeItem.value = pos
+                    }
+                    pos = deferredFilms.value!!.indexOfFirst { item -> item.idWork == work.id.toString() }
+                    if (pos > -1) {
+                        deferredFilms.value!!.removeAt(pos)
+                        deletedDeferred.value = pos
+                    }
+                    liveWork.removeObservers(mainLifeCycleOwner)
+                }
+            }
+        }
+    }
+
+    private suspend fun syncDeferred (works: List<WorkInfo>){
+        for (i in deferredFilms.value!!.size - 1 downTo 0 ){
+            if ( works.indexOfFirst {
+                        work -> deferredFilms.value!![i].idWork == work.id.toString() &&
+                        work.state != WorkInfo.State.ENQUEUED
+                } == -1
+            ) {
+                Repository.removeDeferred(deferredFilms.value!![i].idKp)
+                deferredFilms.value!!.removeAt(i)
+            }
+        }
+        works.forEach { work -> if ( work.state == WorkInfo.State.ENQUEUED){
+                val item = NewItem(Repository.getDeferred(work.id.toString()))
+                if( deferredFilms.value!!.indexOfFirst { it.idWork == work.id.toString()} == -1) deferredFilms.value!!.add(item)
+                val pos = items.value!!.indexOfFirst { it.idKp == item.idKp }
+                if (pos > -1){
+                    items.value!![pos].deferred = true
+                    items.value!![pos].idWork = work.id.toString()
+                    changeItem.value = pos
+                }
+            }
+        }
+    }
+
+    suspend fun observationOfWorks(){
+        val works = workManager.getWorkInfosByTag(WMTAG).await()
+        syncDeferred(works)
+
+        Log.d(WMTAG, "${trace()} обсерватория $works")
+        works.forEach {workInfo ->
+            val work = workManager.getWorkInfoById(workInfo.id).await()
+            if (work.state == WorkInfo.State.ENQUEUED){
+                observationOfWork(workInfo.id)
+            }
+        }
+    }
+
+    suspend fun cancelWork(item: NewItem, pos: Int){
+        workManager.cancelUniqueWork(item.idKp.toString())
+        Repository.removeDeferred(item.idKp)
+        deferredFilms.value!!.removeAt(pos)
+        withContext(Dispatchers.Main){ deletedDeferred.value = pos }
+        val itpos = items.value!!.indexOfFirst { it.idKp == item.idKp }
+        if(itpos > -1){
+            items.value!![itpos].apply {
+                deferred = false
+                idWork = ""
+                deferDateTime = ""
+            }
+            withContext(Dispatchers.Main){ changeItem.value = itpos }
+        }
+    }
+
+    suspend fun addDeferred(item: NewItem, pos: Int, dateTime: String){
         val now = LocalDateTime.now()
         val alarm = LocalDateTime.parse(dateTime)
         val interval = if (alarm > now) Duration.between(now, alarm).toMinutes()
                     else 1
-        item.deferred = true
-        item.deferDateTime = dateTime
-        Log.d(WMTAG, "${trace()} ${item.workData()}")
         val workRequest = OneTimeWorkRequestBuilder<DetailWorker>()
             .setInitialDelay(interval, TimeUnit.MINUTES)
             .addTag(WMTAG)
             .setInputData(item.workData())
             .build()
-        WorkManager
-            .getInstance(ctx)
-            .enqueueUniqueWork(item.idKp.toString(), ExistingWorkPolicy.REPLACE, workRequest)
-        Log.d(WMTAG, "${trace()} ${workRequest.id}")
-        deferredFilms.value!!.add(item.copy())
-        withContext(Dispatchers.Main){changeItem.value = pos}
+        workManager.enqueueUniqueWork(item.idKp.toString(), ExistingWorkPolicy.REPLACE, workRequest)
+
+        item.deferred = true
+        item.deferDateTime = dateTime
+        item.idWork = workRequest.id.toString()
+        observationOfWork(workRequest.id)
+        Log.d(WMTAG, "${trace()} постановка ${workRequest.id}")
+
+        val antPos = currFragment.antonymDefr().list!!.indexOfFirst { litem -> litem.idKp == item.idKp  }
+        if ( antPos > -1) {
+            currFragment.antonymDefr().list!![antPos] = item.copy()
+        }
+
+        withContext(Dispatchers.Main){
+            when(currFragment){
+                Frags.LIST -> {
+                    changeItem.value = pos
+                    if (antPos == -1) {
+                        deferredFilms.value!!.add(item.copy())
+                    }
+                }
+                Frags.DEFER ->changeDeferred.value = pos
+                else ->{}
+            }
+        }
+        Repository.insertWork(item)
     }
 }
 
-class MainViewModelFactory(private val setings: Map<String, *>): ViewModelProvider.Factory{
+class MainViewModelFactory(private val settings: MainActivity.Settings): ViewModelProvider.Factory{
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)){
-            return MainViewModel(setings) as T
+            return MainViewModel(settings) as T
         }
         throw IllegalArgumentException("Неизвестный View Model Class")
     }

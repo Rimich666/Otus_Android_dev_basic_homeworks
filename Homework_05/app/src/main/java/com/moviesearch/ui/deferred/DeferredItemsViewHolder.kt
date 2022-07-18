@@ -9,6 +9,8 @@ class DeferredItemsViewHolder(private val binding: DeferItemBinding):RecyclerVie
     fun bind(item: NewItem, listener: DeferredItemsAdapter.DeferredClickListener){
         binding.textNameDefer.text = item.name
         binding.textShortDescriptionDefer.text = item.description
+        binding.idWork.text = item.idWork
+        binding.textDateTime.text = item.deferDateTime
         val cont = binding.imageDefer.context
         binding.deferredImage.setOnClickListener{
             listener.onDeferClick(item, absoluteAdapterPosition)
