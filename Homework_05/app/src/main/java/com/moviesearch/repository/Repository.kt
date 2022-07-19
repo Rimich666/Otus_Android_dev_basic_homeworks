@@ -17,6 +17,7 @@ import com.moviesearch.datasource.database.Film
 import com.moviesearch.datasource.database.QueryDb
 import com.moviesearch.datasource.database.QueryDb.insertFilms
 import com.moviesearch.datasource.remotedata.LoadData
+import com.moviesearch.parseJson
 import com.moviesearch.trace
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel

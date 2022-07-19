@@ -37,10 +37,10 @@ class DetailFragment : androidx.fragment.app.Fragment() {
         binding.mainToolbar.title = item.name
         binding.detailsText.text = mainModel.detailsText
 
-        val list: List<String> = mainModel.detailsText.chunked(300)
+        /*val list: List<String> = mainModel.detailsText.chunked(300)
         list.forEach {
             println("$it")
-        }
+        }*/
         return view
     }
 
