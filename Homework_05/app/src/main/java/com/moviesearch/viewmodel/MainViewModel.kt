@@ -195,7 +195,9 @@ class MainViewModel(settings: MainActivity.Settings): ViewModel() {
     suspend fun getDetails(idKp:Int, infl: () -> Any ){
         Repository.getDetails(idKp) { msg ->
             detailsText = msg
-            val map: MutableMap<String, Any> = parseJson(detailsText)
+            val details = parseJson(detailsText, Details())
+
+            //val map: MutableMap<String, Any> = parseJson(detailsText)
             infl()
         }
     }

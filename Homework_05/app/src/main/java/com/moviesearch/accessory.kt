@@ -3,9 +3,21 @@ package com.moviesearch
 import android.util.JsonReader
 import android.util.JsonToken
 import android.util.Log
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader.readList
 import java.io.StringReader
+import kotlin.jvm.internal.Intrinsics
+import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.findAnnotations
+import kotlin.reflect.javaType
+import kotlin.reflect.jvm.javaType
+import kotlin.reflect.typeOf
 
 const val WMTAG = "postViewing"
+const val JSTAG = "json"
+
 const val REQUEST_TITLE = "Запрос страницы"
 const val NOTIFICATION_CHANNEL_DESCRIPTION = "App notification channel"
 
@@ -37,6 +49,19 @@ const val JSON_CURVE = "Кривой JSON подсунули"
 var level = 0
 var path = ""
 
+annotation class Path(val path: String)
+
+class Details(){
+    @Path(".poster.url")
+    var poster: String = ""
+    @Path(".name")
+    var name: String = ""
+    @Path(".type")
+    var type: String = ""
+    @Path(".year")
+    var year: Int = 0
+}
+
 inline fun <reified T> parseJson(json: String): T{
     val reader = JsonReader(StringReader(json))
     return when (reader.peek()){
@@ -46,12 +71,40 @@ inline fun <reified T> parseJson(json: String): T{
     }
 }
 
+fun parseJson(json: String, obj: Any): Any {
+    val reader = JsonReader(StringReader(json))
+    val type = obj::class
+    val properties = mutableMapOf<String, Any>()
+    Log.d(JSTAG, "${trace()} annotations = ${type.findAnnotations(Path::class)}")
+    type.declaredMemberProperties.forEach {
+        val action = when(it.returnType.classifier){
+            typeOf<Int>() -> { reader.nextInt() }
+            typeOf<Double>() -> { reader.nextDouble() }
+            typeOf<Long>() -> { reader.nextLong() }
+            typeOf<Boolean>() -> { reader.nextBoolean() }
+            else -> { reader.nextString() }
+        }
+        properties[it.findAnnotation<Path>()!!.path] = mapOf("property" to it, "action" to action)
+        Log.d(JSTAG, "${trace()} property = $it")
+        Log.d(JSTAG, "${trace()} type = ${it.returnType}")
+        Log.d(JSTAG, "${trace()} annotation = ${it.findAnnotation<Path>()?.path}")
+    }
+
+
+    /*when (reader.peek()){
+        JsonToken.BEGIN_OBJECT -> readObject(reader)
+        JsonToken.BEGIN_ARRAY -> readList(reader)
+        else -> JSON_CURVE
+    }*/
+    return obj
+}
+
 fun readList(reader: JsonReader): MutableList<Any>{
     val list = mutableListOf<Any>()
     val root = path
     path = "$root["
     level ++
-    Log.d("json", "level = $level")
+    Log.d("json", "${trace()} level = $level")
     reader.beginArray()
     while (reader.hasNext()){
         when (reader.peek()){
