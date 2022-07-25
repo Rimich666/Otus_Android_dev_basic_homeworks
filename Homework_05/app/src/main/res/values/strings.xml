@@ -54,4 +54,5 @@
     <string name="input_time">время</string>
     <string name="ok" translatable="false">OK</string>
     <string name="cancel" translatable="false">Cancel</string>
+    <string name="msg_token_fmt" translatable="false">Firebase token: %1$s</string>
 </resources>

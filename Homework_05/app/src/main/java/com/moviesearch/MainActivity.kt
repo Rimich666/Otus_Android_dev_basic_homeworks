@@ -3,6 +3,7 @@ package com.moviesearch
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 import android.widget.Toast
@@ -13,21 +14,26 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.replace
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.datatransport.runtime.util.PriorityMapping.toInt
+import com.google.android.gms.tasks.OnCompleteListener
 
 
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.messaging.FirebaseMessaging
 import com.moviesearch.ui.NewItem
 import com.moviesearch.ui.start.StartFragment
 import com.moviesearch.ui.detail.DetailFragment
 import com.moviesearch.ui.favourites.FavouritesFragment
 import com.moviesearch.ui.list.ListMovieFragment
 import com.moviesearch.databinding.ActivityMainBinding
+import com.moviesearch.firebase.RemoteConfig
 import com.moviesearch.repository.Repository
 import com.moviesearch.ui.deferred.DeferredFilmsFragment
 import com.moviesearch.viewmodel.MainViewModel
 import com.moviesearch.viewmodel.MainViewModelFactory
 import kotlinx.coroutines.*
+import java.lang.RuntimeException
 import kotlin.system.exitProcess
 
 enum class Frags{LIST {
@@ -80,7 +86,16 @@ class MainActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Settings.owner = this
-        val idKp = intent.getIntExtra("idKp", -1)
+        intent.extras?.keySet()?.forEach {
+            Log.d(FTTAG, "${trace()} onCreate: $it")
+        }
+
+        val idKp = when (val idKPSS = intent.extras?.get("idKp")){
+            is Int -> idKPSS
+            is String -> idKPSS.toInt()
+            else -> -1
+        }
+        RemoteConfig.init()
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         viewModelFactory = MainViewModelFactory(Settings)
         viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
@@ -128,6 +143,7 @@ class MainActivity : AppCompatActivity(),
      }
 
     override fun showDetail(position:Int){
+        //throw RuntimeException("Test crash")
         if (viewModel.selectedPosition > -1){ viewModel.items.value!![viewModel.selectedPosition].selected = false }
         viewModel.selectedPosition = position
         val item = viewModel.items.value!![position]
@@ -136,10 +152,6 @@ class MainActivity : AppCompatActivity(),
             viewModel.getDetails(item.idKp, Frags.DETLS.inflater)
         }
     }
-
-    /*private val takeDetails: (msg: String) -> Unit = { msg ->
-        viewModel.detailsText = msg
-        Frags.DETLS.inflater()}*/
 
     private fun itemSelected (mI: MenuItem): Boolean
     {
@@ -157,6 +169,20 @@ class MainActivity : AppCompatActivity(),
                 return true
             }
             R.id.navigation_notifications -> {
+                FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                    if (!task.isSuccessful) {
+                        Log.w(FTTAG, "Fetching FCM registration token failed", task.exception)
+                        return@OnCompleteListener
+                    }
+
+                    // Get new FCM registration token
+                    val token = task.result
+
+                    // Log and toast
+                    val msg = getString(R.string.msg_token_fmt, token)
+                    Log.d(FTTAG, msg)
+                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+                })
                 return true
             }
         }

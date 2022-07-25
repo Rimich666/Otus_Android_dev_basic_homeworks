@@ -30,7 +30,7 @@ class DetailFragment : androidx.fragment.app.Fragment() {
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_detail_, container, false)
         val view = binding.root
-        val item = mainModel.items.value!![mainModel.selectedPosition]
+        val item = mainModel.details
         Glide.with(this)
             .load(item.poster)
             .into(binding.mainBackdrop)

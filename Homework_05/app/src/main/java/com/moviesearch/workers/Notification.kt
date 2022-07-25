@@ -8,17 +8,15 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.moviesearch.*
 import com.moviesearch.App.Companion.appContext
-import com.moviesearch.MainActivity
-import com.moviesearch.NOTIFICATION_CHANNEL_DESCRIPTION
-import com.moviesearch.R
-import com.moviesearch.WMTAG
 import okhttp3.internal.notify
 
 object Notification {
     private val channelName = appContext.getString(R.string.app_name)
     private val channelId = "${appContext.packageName} - $channelName"
     fun createNotificationChanel(){
+        Log.d(FTTAG, "${trace()} channelId = $channelId")
         val channel = NotificationChannel(channelId, channelName, NotificationManagerCompat.IMPORTANCE_DEFAULT)
         channel.description = NOTIFICATION_CHANNEL_DESCRIPTION
         channel.setShowBadge(false)
@@ -34,6 +32,7 @@ object Notification {
             setContentTitle(title)
             setContentText(message)
             setChannelId(channelId)
+            color = R.color.purple_200
             setStyle(NotificationCompat.BigTextStyle().bigText(bigText))
             priority = NotificationCompat.PRIORITY_DEFAULT
             setAutoCancel(autoCancel)
@@ -43,7 +42,6 @@ object Notification {
             val pendingIntent = PendingIntent.getActivity(appContext, 0, intent, PendingIntent.FLAG_IMMUTABLE)
             setContentIntent(pendingIntent)
         }
-        //Log.d(WMTAG, "create notification")
         val notificationManager = NotificationManagerCompat.from(appContext)
         notificationManager.notify(102, notificationBuilder.build())
     }

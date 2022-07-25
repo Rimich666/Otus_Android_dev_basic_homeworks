@@ -2,6 +2,7 @@ package com.moviesearch.ui
 
 import androidx.room.ColumnInfo
 import androidx.work.workDataOf
+import com.moviesearch.Path
 import com.moviesearch.datasource.database.DeferredFilm
 import com.moviesearch.datasource.database.Favourite
 import com.moviesearch.datasource.database.Film
@@ -95,5 +96,20 @@ data class NewItem(
         item.deferDateTime = deferDateTime
         item.idWork = idWork
         return item
+    }
+}
+
+class Details(){
+    @Path(".poster.url")
+    var poster: String = ""
+    @Path(".name")
+    var name: String = ""
+    @Path(".type")
+    var type: String = ""
+    @Path(".year")
+    var year: Int = 0
+
+    override fun toString(): String{
+        return "\nname = $name\ntype = $type\nyear = $year\nposter = $poster"
     }
 }

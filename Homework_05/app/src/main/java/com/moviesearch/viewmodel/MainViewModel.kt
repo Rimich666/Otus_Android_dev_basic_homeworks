@@ -13,6 +13,7 @@ import com.moviesearch.ui.start.RequestedItem
 import com.moviesearch.ui.start.StartItem
 import com.moviesearch.datasource.database.Favourite
 import com.moviesearch.repository.Repository
+import com.moviesearch.ui.Details
 import com.moviesearch.workers.DetailWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -28,6 +29,7 @@ class MainViewModel(settings: MainActivity.Settings): ViewModel() {
     var selectedPosition: Int = settings.selectedPosition
     private val mainLifeCycleOwner = settings.owner
     var detailsText: String = ""
+    lateinit var details: Details
     var items: MutableLiveData<MutableList<NewItem>> = MutableLiveData(mutableListOf())
     var favourites: MutableLiveData<MutableList<NewItem>> = MutableLiveData(mutableListOf())
     var deferredFilms: MutableLiveData<MutableList<NewItem>> = MutableLiveData(mutableListOf())
@@ -195,7 +197,7 @@ class MainViewModel(settings: MainActivity.Settings): ViewModel() {
     suspend fun getDetails(idKp:Int, infl: () -> Any ){
         Repository.getDetails(idKp) { msg ->
             detailsText = msg
-            val details = parseJson(detailsText, Details())
+            details = parseJson(msg, Details()) as Details
 
             //val map: MutableMap<String, Any> = parseJson(detailsText)
             infl()
