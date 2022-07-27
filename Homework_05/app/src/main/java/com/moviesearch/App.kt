@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import com.moviesearch.datasource.database.DbObject
 import com.moviesearch.datasource.database.FilmDb
+import com.moviesearch.firebase.RemoteConfig
 import com.moviesearch.workers.Notification
 import java.util.concurrent.Executors
 
@@ -19,6 +20,8 @@ class App: Application() {
             Log.d("TraceOfBase", "А при старте что? ${db.toString()}")
         }
         Notification.createNotificationChanel()
+        RemoteConfig.init()
+        //RemoteConfig.getParameters()
     }
 
     companion object{

@@ -6,10 +6,9 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.await
 import com.google.common.util.concurrent.ListenableFuture
+import com.moviesearch.*
 import com.moviesearch.App.Companion.db
-import com.moviesearch.Keys
 import com.moviesearch.Keys.progress
-import com.moviesearch.WMTAG
 import com.moviesearch.datasource.database.DeferredFilm
 import com.moviesearch.ui.NewItem
 import com.moviesearch.datasource.database.Favourite
@@ -17,8 +16,6 @@ import com.moviesearch.datasource.database.Film
 import com.moviesearch.datasource.database.QueryDb
 import com.moviesearch.datasource.database.QueryDb.insertFilms
 import com.moviesearch.datasource.remotedata.LoadData
-import com.moviesearch.parseJson
-import com.moviesearch.trace
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 
@@ -62,7 +59,8 @@ object Repository {
         var successful = true
         var responseCount = 0
         val responseTotal = pages!!.size
-
+        var limit: Int = 0
+        var max: Int = 0
         launch(Dispatchers.IO) {
             LoadData.loadPages(pages!!) { msg ->
                 var channel: Channel<Long>? = null
@@ -70,7 +68,14 @@ object Repository {
                     msg[0].containsKey(Keys.pages) -> {
                         channel = Channel(Channel.RENDEZVOUS)
                         launch { insertFilms(msg, channel) }
-                        if (msg[0]["page"] == currentPage) {
+                        if (msg.size < limit - 1) {
+                            max = max - limit + msg.size - 1
+                            Log.d(RCTAG, "${trace()} size = ${msg.size} page = ${msg[0][Keys.page]} max = $max")
+                            withContext(Dispatchers.Main){
+                                progress(mutableListOf(mutableMapOf(Keys.max to max)))
+                            }
+                        }
+                        if (msg[0][Keys.page] == currentPage) {
                             pagesCount = msg[0][Keys.pages] as Int
                             withContext(Dispatchers.Main) { progress(msg) }
                         }
@@ -87,6 +92,8 @@ object Repository {
                             }
                     }
                     msg[0].containsKey(Keys.max) ->{
+                        limit = msg[0][Keys.limit] as Int
+                        max = msg[0][Keys.max] as Int
                         if (!replay) withContext(Dispatchers.Main) { progress(msg) }
                     }
                     else -> withContext(Dispatchers.Main) { progress(msg) }

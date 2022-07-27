@@ -99,6 +99,7 @@ data class NewItem(
     }
 }
 
+
 class Details(){
     @Path(".poster.url")
     var poster: String = ""

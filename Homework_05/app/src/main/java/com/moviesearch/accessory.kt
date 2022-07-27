@@ -3,13 +3,17 @@ package com.moviesearch
 import android.util.JsonReader
 import android.util.JsonToken
 import android.util.Log
+import com.google.android.gms.common.internal.safeparcel.SafeParcelReader.readList
 import java.io.StringReader
 import java.lang.annotation.RetentionPolicy
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import kotlin.reflect.*
 import kotlin.reflect.full.*
+import kotlin.reflect.jvm.internal.impl.builtins.PrimitiveType
+import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 import kotlin.reflect.jvm.javaType
+import kotlin.reflect.jvm.kotlinProperty
 
 const val WMTAG = "postViewing"
 const val JSTAG = "json"
@@ -39,6 +43,8 @@ object Keys{
     const val favour = "favour"
     const val deferred = "deferred"
     const val max = "max"
+    const val limit = "limit"
+    const val page = "page"
 
     const val progress = "progress"
 }
@@ -52,7 +58,11 @@ annotation class Path(val path: String)
 annotation class MyObject()
 
 
-class Prop(val property: KMutableProperty<*>, val action: () -> Any)
+class Prop(val property: KMutableProperty<*>){
+    lateinit var action: () -> Any
+    lateinit var type: KClass<*>
+}
+
 
 inline fun <reified T> parseJson(json: String): T{
     val reader = JsonReader(StringReader(json))
@@ -67,100 +77,210 @@ private inline fun <reified T> getType(list: MutableList<T>){
     Log.d(RCTAG, "${trace()} Type of list: ${T::class}")
 }
 
+const val TAG = "Generic"
+
+private fun fillProperties(type: KClass<out Any>, prop: MutableMap<String, Prop>, reader: JsonReader){
+    var classArg: KClass<out Any>
+
+    type.declaredMemberProperties.filterIsInstance<KMutableProperty<*>>().forEach {
+
+        if (!it.hasAnnotation<Path>()) return@forEach
+        Log.d(TAG, "${trace()} type = ${it.returnType.classifier}")
+        val action: () -> Any
+        Log.d(TAG, "${trace()} javaClass = ${it.returnType /*.returnType.javaType*//* .returnType*/}")
+        if (it.returnType.javaClass.isPrimitive) {
+            action = when (it.returnType) {
+                typeOf<Int>() -> {
+                    { reader.nextInt() }
+                }
+                typeOf<Double>() -> {
+                    { reader.nextDouble() }
+                }
+                typeOf<Long>() -> {
+                    { reader.nextLong() }
+                }
+                typeOf<Boolean>() -> {
+                    { reader.nextBoolean() }
+                }
+                //typeOf<String>() -> { { reader.nextString() } }
+                else -> {
+                    { reader.nextString() }
+                }
+            }
+        }
+        else{
+            classArg = if (it.returnType.javaType is ParameterizedType){
+                Log.d(TAG, "${trace()} type_____ = ${it.returnType.arguments[0].javaClass.name}")
+                Class.forName(it.returnType.arguments[0].javaClass.name/* .toString()*/).kotlin
+            }
+
+            else{
+                Log.d(TAG, "${trace()} type = ${it.returnType.javaClass}")
+                //Log.d(TAG, "${trace()} primitive = ${it.javaClass.isPrimitive/* .returnType*/}")
+                Class.forName(it.returnType.toString()).kotlin
+            }
+
+            if (classArg.hasAnnotation<MyObject>()){
+                fillProperties(classArg, prop, reader)
+            }
+        }
+
+
+
+           /* action = when(it.returnType){
+                typeOf<Int>() -> { { reader.nextInt() } }
+                typeOf<Double>() -> { { reader.nextDouble() } }
+                typeOf<Long>() -> { { reader.nextLong() } }
+                typeOf<Boolean>() -> { { reader.nextBoolean() } }
+                else -> { { reader.nextString() } }
+            }
+
+            prop[it.findAnnotation<Path>()!!.path] = Prop(it, action)*/
+
+
+
+
+            /*if (it.returnType.classifier == MutableList::class){
+                //it.getter.call(obj)!!.javaClass.declaredFields
+                Log.d(RCTAG, "${trace()} ${it.getter.call(obj)!!::class}")
+                Log.d(RCTAG, "${trace()} MutableList")
+            }
+            else
+                Log.d(RCTAG, "${trace()} не MutableList")*/
+           /* if (it.returnType.javaType is ParameterizedType){
+                Log.d(TAG, "${trace()} ${it.returnType} ParameterizedType: ${Class.forName(it.returnType.arguments[0].toString()).declaredAnnotations}")
+
+                classArg = Class.forName(it.returnType.arguments[0].toString())
+                classArg.declaredAnnotations.forEach {an ->
+                    Log.d(RCTAG, "${trace()} Argument annotation: ${an.annotationClass}")
+                }
+                if (classArg.isAnnotationPresent(MyObject::class.java))
+                    Log.d(RCTAG, "${trace()} ${it.returnType} аннотирован")
+                else
+                    Log.d(RCTAG, "${trace()} ${it.returnType} не аннотирован")
+            }
+            else{
+                Log.d(RCTAG, "${trace()} ${it.returnType} не ParameterizedType")
+            }*/
+
+            /*it.returnType::class.declaredMemberProperties.forEach {subit->
+                Log.d(RCTAG, "${trace()} subit ${subit.name}: ${subit.returnType}")
+            }*/
+
+
+            /*Log.d(RCTAG, "${trace()} property = $it")
+            Log.d(RCTAG, "${trace()} type = ${it.returnType}")
+            Log.d(RCTAG, "${trace()} annotation = ${it.findAnnotation<Path>()?.path}")*/
+        }
+
+
+}
+
+private fun fillProperties(jC: Class<*>, properties: MutableMap<String, Prop>, reader: JsonReader){
+    var classArg: Class<*>
+    jC.declaredFields.forEach {
+        //Log.d(TAG, "${trace()} javaClass.declaredField: ${it.name} annotated: ${it.kotlinProperty!!.hasAnnotation<Path>()}")
+        /*it.kotlinProperty!!.annotations.forEach {an ->
+            Log.d(TAG, "${trace()} annotation: ${an.annotationClass}")
+        }*/
+        if (!it.kotlinProperty!!.hasAnnotation<Path>()) return@forEach
+        //Log.d(TAG, "${trace()} javaClass.declaredField: ${it.name} genericType: ${it.genericType}")
+        val genericType = it.genericType
+        var action: () -> Any = {}
+        classArg = if (genericType is ParameterizedType){
+            Class.forName(genericType.actualTypeArguments[0].typeName)
+        } else{
+            it.type
+        }
+        if (classArg.isAnnotationPresent(MyObject::class.java))
+            fillProperties(classArg, properties, reader)
+        else
+            Log.d(TAG, "${trace()} ${it.name} classArg: ${classArg.kotlin}")
+            action = when (classArg.kotlin) {
+                Int::class -> {
+                    { reader.nextInt() }
+                }
+                Double::class -> {
+                    { reader.nextDouble() }
+                }
+                Long::class -> {
+                    { reader.nextLong() }
+                }
+                Boolean::class -> {
+                    { reader.nextBoolean() }
+                }
+                else -> {
+                    { reader.nextString() }
+                }
+            }
+        properties[it.kotlinProperty!!.findAnnotation<Path>()!!.path] =
+            Prop(it.kotlinProperty as KMutableProperty<*>).apply {
+                this.action = action
+                this.type = classArg.kotlin
+            }
+    }
+
+}
+
+private const val VOW =
+"""
+Торжественно клянусь причесать этот сумбур... скоро ...
+в этом году
+"""
+
 fun parseJson(json: String, obj: Any): Any {
     val reader = JsonReader(StringReader(json))
     val type = obj::class
     val properties = mutableMapOf<String, Prop>()
-    val TAG = "Generic"
-    var classArg: Class<*>
-    /*obj.javaClass.declaredFields.forEach {
-
-        Log.d(TAG, "${trace()} javaClass.declaredField: ${it.name} genericType: ${it.genericType}")
-        val genericType = it.genericType
-        if (genericType is ParameterizedType){
-            val typeArguments: Array<out Type> = genericType.actualTypeArguments
-            Log.d(TAG, "${trace()} javaClass.declaredField: ${it.name} typeArguments: ${typeArguments[0].typeName}")
-            classArg = Class.forName(typeArguments[0].typeName)
-            classArg.declaredAnnotations.forEach {an ->
-                Log.d(TAG, "${trace()} Argument annotation: ${an.annotationClass}")
-            }
-            classArg.isAnnotationPresent(MyObject().javaClass)
-        }
-    }*/
-
-    type.declaredMemberProperties.filterIsInstance<KMutableProperty<*>>().forEach {
-        Log.d(JSTAG, "${trace()} type = ${it.returnType.classifier}")
-
-        val action: () -> Any = when(it.returnType){
-            typeOf<Int>() -> { { reader.nextInt() } }
-            typeOf<Double>() -> { { reader.nextDouble() } }
-            typeOf<Long>() -> { { reader.nextLong() } }
-            typeOf<Boolean>() -> { { reader.nextBoolean() } }
-            else -> { { reader.nextString() } }
-        }
-
-        properties[it.findAnnotation<Path>()!!.path] = Prop(it, action)
-
-
-
-
-        /*if (it.returnType.classifier == MutableList::class){
-            //it.getter.call(obj)!!.javaClass.declaredFields
-            Log.d(RCTAG, "${trace()} ${it.getter.call(obj)!!::class}")
-            Log.d(RCTAG, "${trace()} MutableList")
-        }
-        else
-            Log.d(RCTAG, "${trace()} не MutableList")*/
-        if (it.returnType.javaType is ParameterizedType){
-            Log.d(TAG, "${trace()} ${it.returnType} ParameterizedType: ${Class.forName(it.returnType.arguments[0].toString()).declaredAnnotations}")
-
-            classArg = Class.forName(it.returnType.arguments[0].toString())
-            classArg.declaredAnnotations.forEach {an ->
-                Log.d(RCTAG, "${trace()} Argument annotation: ${an.annotationClass}")
-            }
-            if (classArg.isAnnotationPresent(MyObject::class.java))
-                Log.d(RCTAG, "${trace()} ${it.returnType} аннотирован")
-            else
-                Log.d(RCTAG, "${trace()} ${it.returnType} не аннотирован")
-        }
-        else{
-            Log.d(RCTAG, "${trace()} ${it.returnType} не ParameterizedType")
-        }
-
-        /*it.returnType::class.declaredMemberProperties.forEach {subit->
-            Log.d(RCTAG, "${trace()} subit ${subit.name}: ${subit.returnType}")
-        }*/
-
-
-        Log.d(RCTAG, "${trace()} property = $it")
-        Log.d(RCTAG, "${trace()} type = ${it.returnType}")
-        Log.d(RCTAG, "${trace()} annotation = ${it.findAnnotation<Path>()?.path}")
+    fillProperties(obj.javaClass, properties, reader)
+    properties.forEach {
+        Log.d(TAG, "${trace()} property: $it")
     }
-    Log.d(RCTAG, "${trace()} properties = $properties")
+
     when (reader.peek()){
         JsonToken.BEGIN_OBJECT -> readObject(reader, obj, properties)
         JsonToken.BEGIN_ARRAY -> readList(reader, obj, properties)
         else -> JSON_CURVE
     }
-    Log.d(JSTAG, "${trace()} obj = $obj")
+    Log.d(TAG, "${trace()} obj = ${obj.toString()}")
     return obj
 }
 
 private fun readList(reader: JsonReader, obj: Any, prop: MutableMap<String, Prop>){
     val root = path
+
     path = "$root["
-    Log.d(RCTAG, "${trace()} path = $path")
+    Log.d(TAG, "${trace()} path = $path")
     level ++
     reader.beginArray()
     while (reader.hasNext()){
-        when (reader.peek()){
-            JsonToken.STRING -> {reader.nextString()}
-            JsonToken.BEGIN_ARRAY -> {readList(reader, obj, prop)}
-            JsonToken.BEGIN_OBJECT -> {readObject(reader, obj, prop)}
-            JsonToken.NUMBER -> {reader.nextString()}
-            JsonToken.NULL -> {reader.skipValue()}
-            JsonToken.BOOLEAN -> {reader.nextBoolean()}
-            else -> {throw Exception( JSON_CURVE )}
+        if (path in prop.keys && prop[path]!!.property.returnType.classifier == MutableList::class){
+            val list = prop[path]!!.property.getter.call(obj) as MutableList<Any>
+            when (reader.peek()){
+                JsonToken.STRING -> {list.add(reader.nextString())}
+                JsonToken.BEGIN_ARRAY -> {readList(reader, obj, prop)}
+                JsonToken.BEGIN_OBJECT -> {
+                    val inst = prop[path]!!.type.createInstance()
+                    Log.d(TAG, "${trace()} inst = $inst")
+                    readObject(reader, inst, prop)
+                    list.add(inst)
+                }
+                JsonToken.NUMBER -> {list.add(reader.nextString())}
+                JsonToken.NULL -> {reader.skipValue()}
+                JsonToken.BOOLEAN -> {reader.nextBoolean()}
+                else -> {throw Exception( JSON_CURVE )}
+            }
+        }
+        else{
+            when (reader.peek()){
+                JsonToken.STRING -> {reader.nextString()}
+                JsonToken.BEGIN_ARRAY -> {readList(reader, obj, prop)}
+                JsonToken.BEGIN_OBJECT -> {readObject(reader, obj, prop)}
+                JsonToken.NUMBER -> {reader.nextString()}
+                JsonToken.NULL -> {reader.skipValue()}
+                JsonToken.BOOLEAN -> {reader.nextBoolean()}
+                else -> {throw Exception( JSON_CURVE )}
+            }
         }
     }
     reader.endArray()
@@ -180,13 +300,13 @@ private  fun readObject(reader: JsonReader, obj: Any, prop: MutableMap<String, P
             JsonToken.NAME -> {
                 name = reader.nextName()
                 path = "$root.$name"
-                Log.d(RCTAG, "${trace()} path = $path")
+                Log.d(TAG, "${trace()} path = $path")
             }
             else -> {
                 if (path in prop.keys){
                     if (reader.peek() == JsonToken.NULL) reader.skipValue()
                     else {
-                        Log.d("json", "${trace()} action = ${prop[path]!!.action}")
+                        Log.d(TAG, "${trace()} action = ${prop[path]!!.action}")
                         prop[path]!!.property.setter.call(obj, prop[path]!!.action())
                     }
                 }

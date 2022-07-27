@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity(),
             is String -> idKPSS.toInt()
             else -> -1
         }
-        RemoteConfig.init()
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         viewModelFactory = MainViewModelFactory(Settings)
         viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]

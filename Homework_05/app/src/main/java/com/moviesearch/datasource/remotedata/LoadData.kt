@@ -4,6 +4,8 @@ import android.util.JsonReader
 import android.util.JsonToken
 import android.util.Log
 import com.moviesearch.Keys
+import com.moviesearch.RCTAG
+import com.moviesearch.firebase.RemoteConfig
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import okhttp3.*
@@ -15,7 +17,7 @@ import java.lang.Exception
 
 object LoadData {
     private var okHttpClient: OkHttpClient = OkHttpClient()
-    private const val BAD_URL = "https://api.kinopoisk.dev/movje"
+    //private const val BAD_URL = "https://api.kinopoisk.dev/movje"
     private const val URL = "https://api.kinopoisk.dev/movie"
     private const val TOKEN = "MKRJKN4-Q0B463J-J85RBPK-ENWYABY"
     private var limit = 50
@@ -26,8 +28,7 @@ object LoadData {
     ) = coroutineScope {
         val recC = pages.size * limit
         val chProgress = Channel<MutableMap<String, Any>>()
-
-        updateResults(mutableListOf(mutableMapOf(Keys.max to recC)))//, "complete" to false))
+        updateResults(mutableListOf(mutableMapOf(Keys.max to recC, Keys.limit to limit)))//, "complete" to false))
         val listsOfPage = mutableMapOf<Int, MutableList<MutableMap<String, Any>>>()
 
         for (page in pages) {
@@ -35,7 +36,10 @@ object LoadData {
             launch {
                 val json: String? = request(
                     mapOf("page" to page.toString(),
-                        "limit" to limit.toString()),
+                        "limit" to limit.toString(),
+                        "search" to RemoteConfig.getSearchMap(),
+                        "sort" to RemoteConfig.getSortMap()
+                    ),
                     chProgress,
                 )
                 if (json != null) toBase(json, chProgress, page)
@@ -71,15 +75,25 @@ object LoadData {
         val urlBuilder: HttpUrl.Builder =
             URL.toHttpUrlOrNull()?.newBuilder() ?: error("URL не удался")
         urlBuilder.addQueryParameter("token", TOKEN)
-
-        pars.forEach{ (key, value) -> if(key == "search") {
-                val search = value as Map<*,*>
-                search.forEach{ (k, v) -> urlBuilder.addQueryParameter("search", v.toString())
-                    urlBuilder.addQueryParameter("field", k.toString())}
+        Log.d(RCTAG, "${trace()} $pars")
+        pars.forEach{ (key, value) ->
+            when(key)
+            {
+                "search" -> {
+                    val search = value as Map<*,*>
+                    search.forEach{ (k, v) -> urlBuilder.addQueryParameter("search", v.toString())
+                        urlBuilder.addQueryParameter("field", k.toString())}
+                }
+                "sort" -> {
+                    val search = value as Map<*,*>
+                    search.forEach{ (k, v) -> urlBuilder.addQueryParameter("sortType", v.toString())
+                        urlBuilder.addQueryParameter("sortField", k.toString())}
+                }
+                else -> urlBuilder.addQueryParameter(key, value.toString())
             }
-                else urlBuilder.addQueryParameter(key, value.toString())
         }
         val url: String = urlBuilder.build().toString()
+        Log.d(RCTAG, "${trace()} url: $url")
         val request: Request = Request.Builder().url(url).build()
         var returned: String?
         var codeResponse: Int = 666
