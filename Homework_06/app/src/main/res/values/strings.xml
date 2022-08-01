@@ -1,0 +1,58 @@
+<resources>
+    <string name="app_name">Поиск фильмов</string>
+    <string name="butt_detail">Детали</string>
+    <string name="movies" translatable="false">
+        [
+            {
+                \"name\": \"Зеленая миля\",
+                \"description\": \"The Green Mile, 1999, 189 мин.\",
+                \"pictures\": \"greenmile\",
+                \"poster\": \"green_mile\"
+            },
+            {
+                \"name\": \"Список Шиндлера\",
+                \"description\": \"Schindler\'s List, 1993, 195 мин.\",
+                \"pictures\": \"schindlerslist\",
+                \"poster\": \"green_mile\"
+            },
+            {
+                \"name\": \"Побег из Шоушенка\",
+                \"description\": \"The Shawshank Redemption, 1994, 142 мин.\",
+                \"pictures\": \"shawshankredemption\",
+                \"poster\": \"green_mile\"
+            },
+            {
+                \"name\": \"Властелин колец: Возвращение короля\",
+                \"description\": \"The Lord of the Rings: The Return of the King, 2003, 201 мин.\",
+                \"pictures\": \"returnking\",
+                \"poster\": \"green_mile\"
+            },
+            {
+                \"name\": \"Форрест Гамп\",
+                \"description\": \"Forrest Gump, 1994, 142 мин.\",
+                \"pictures\": \"forrestgump\",
+                \"poster\": \"green_mile\"
+            },
+            {
+                \"name\": \"Властелин колец: Две крепости\",
+                \"description\":
+                \"The Lord of the Rings: The Two Towers, 2002, 179 мин.\",
+                \"pictures\": \"twotowers\",
+                \"poster\": \"green_mile\"
+            }
+        ]</string>
+    <string name="invite_friend">Пригласить друга</string>
+    <string name="action_favorites">Избранное</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="title_activity_bottom_nav" translatable="false">BottomNavActivity</string>
+    <string name="title_home" translatable="false">Home</string>
+    <string name="title_dashboard" translatable="false">Dashboard</string>
+    <string name="title_notifications" translatable="false">Notifications</string>
+    <string name="string_lorem" translatable="false">string/lorem kerjnaerggrvlaerkghkfnhbvjanakfdsnvbfdka.snvdkasfnvdnv.jvnsnvwkrs</string>
+    <string name="input_date">дата</string>
+    <string name="input_time">время</string>
+    <string name="ok" translatable="false">OK</string>
+    <string name="cancel" translatable="false">Cancel</string>
+    <string name="msg_token_fmt" translatable="false">Firebase token: %1$s</string>
+</resources>

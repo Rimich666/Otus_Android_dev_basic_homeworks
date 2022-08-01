@@ -13,8 +13,6 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat.startActivity
-import androidx.fragment.app.FragmentManager
 import com.example.helloworld.database.DbObject
 import com.example.helloworld.database.Film
 import com.example.helloworld.database.FilmDb
@@ -26,7 +24,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.*
 import okhttp3.*
-import retrofit2.Retrofit
 import java.io.IOException
 import java.io.StringReader
 import java.time.LocalDateTime
@@ -53,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         val btnCor = findViewById<Button>(R.id.button_coroutines)
         val btnDatePicker = findViewById<Button>(R.id.button_date_picker)
         val btnExperiments = findViewById<Button>(R.id.button_date_time_exp)
+        val btnRX = findViewById<Button>(R.id.button_rx)
         txt = findViewById<TextView>(R.id.textView)
         prgBar = findViewById(R.id.progress)
         rndPrg = findViewById(R.id.round_progress)
@@ -69,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         btnCor.setOnClickListener{ coroutines() }
         btnDatePicker.setOnClickListener{ datePickerInflate() }
         btnExperiments.setOnClickListener{ timeExperiments() }
+        btnRX.setOnClickListener { main() }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
