@@ -1,5 +1,6 @@
 package com.moviesearch.datasource.remotedata
 
+import android.content.ClipData
 import android.util.JsonReader
 import android.util.JsonToken
 import android.util.Log
@@ -22,8 +23,42 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.lang.Exception
 
-class Item(val page: Int){
+class Docs{
+    var page: Int = 0
+    @Path(".docs[")
+    lateinit var doc: Doc
+    fun Doc() = Doc(page)
+    @Path(".")
+    lateinit var tail: Tail
+    fun Tail() = Tail(page)
+}
 
+@MyObject
+class Doc(var page: Int){
+    @Path(".docs[.id")
+    var idKp: Int = 0
+    @Path(".docs[.name")
+    var name: String = ""
+    @Path(".docs[.alternativeName")
+    var altName: String = ""
+    @Path(".docs[.shortDescription")
+    var description: String = ""
+    @Path(".docs[.poster.previewUrl")
+    var pictures: String = ""
+    @Path(".docs[.year")
+    var year: Int = 0
+    @Path(".docs[.rating.kp")
+    var rating: Int = 0
+    @Path(".docs[.movieLength")
+    var movieLength: Int = 0
+}
+
+@MyObject
+class Tail(var page: Int){
+    @Path(".total")
+    var total: Int = 0
+    @Path(".pages")
+    var pages: Int = 0
 }
 
 class ResultRequest(val codeResponse: Int, val page: Int, val successful: Boolean){
@@ -55,7 +90,7 @@ object LoadData {
                     ),
                     emitter
                 )
-                if (json != null) parseJson(json, Item(pages[it]) ,emitter)
+                if (json != null) parseJson(json, Docs(), emitter)
             }
         }
         val observable = Observable.mergeArray(*arr)

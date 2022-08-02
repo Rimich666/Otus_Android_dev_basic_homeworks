@@ -1,0 +1,56 @@
+{
+  "docs":
+  [
+    {
+      "externalId":
+      {
+        "_id":"62188d02651ebcb9df14cb78",
+        "imdb":"tt4452272"
+      },
+      "poster":
+      {
+        "_id":"62188d02651ebcb9df14cb7a",
+        "url":"https://st.kp.yandex.net/images/film_big/901914.jpg",
+        "previewUrl":"https://st.kp.yandex.net/images/film_iphone/iphone360_901914.jpg"
+      },
+      "rating":
+      {
+        "_id":"62188d02651ebcb9df14cb7b",
+        "kp":0,
+        "imdb":0,
+        "filmCritics":0,
+        "russianFilmCritics":0,
+        "await":0
+      },
+      "votes":
+      {
+        "_id":"62188d02651ebcb9df14cb7c",
+        "kp":2,
+        "imdb":0,
+        "filmCritics":0,
+        "russianFilmCritics":0,
+        "await":0
+      },
+      "id":901914,
+      "type":"movie",
+      "name":null,
+      "description":null,
+      "year":1917,
+      "alternativeName":"Military Madness",
+      "enName":null,
+      "movieLength":null,
+      "names":
+      [
+        {
+          "_id":"62188d02651ebcb9df14cb79",
+          "name":"Military Madness"
+        }
+      ],
+      "shortDescription":null
+    }
+  ],
+  "total":880081,
+  "limit":1,
+  "page":1,
+  "pages":880081
+}

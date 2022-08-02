@@ -1,12 +1,11 @@
 package com.moviesearch.ui
 
-import androidx.room.ColumnInfo
 import androidx.work.workDataOf
 import com.moviesearch.Path
 import com.moviesearch.datasource.database.DeferredFilm
 import com.moviesearch.datasource.database.Favourite
 import com.moviesearch.datasource.database.Film
-import java.util.*
+
 
 data class NewItem(
     val idKp: Int,

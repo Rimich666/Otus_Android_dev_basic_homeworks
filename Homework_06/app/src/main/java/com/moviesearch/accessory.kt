@@ -5,6 +5,10 @@ import android.util.JsonToken
 import android.util.Log
 import com.google.android.gms.common.internal.safeparcel.SafeParcelReader.readList
 import io.reactivex.rxjava3.core.Emitter
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import java.io.StringReader
 import java.lang.annotation.RetentionPolicy
 import java.lang.reflect.ParameterizedType
@@ -118,16 +122,111 @@ fun parseJson(json: String, obj: Any, emitter: Emitter<Any>){
     val properties = mutableMapOf<String, Prop>()
     fillProperties(obj.javaClass, properties, reader)
     properties.forEach {
-        Log.d(TAG, "${trace()} property: $it")
+        Log.d(RXTAG, "${trace()} property: $it")
     }
-
+    val observable: Observable<Any> =
     when (reader.peek()){
-        JsonToken.BEGIN_OBJECT -> readObject(reader, obj, properties)
-        JsonToken.BEGIN_ARRAY -> readList(reader, obj, properties)
-        else -> JSON_CURVE
+        JsonToken.BEGIN_OBJECT -> Observable.create<Any>{ readObject(reader, obj, properties, emitter) }
+        JsonToken.BEGIN_ARRAY -> Observable.create<Any>{ readList(reader, obj, properties, emitter) }
+        else -> Observable.create<Any>{ em -> em.onError(Throwable(JSON_CURVE)) }
     }
-    Log.d(TAG, "${trace()} obj = ${obj.toString()}")
+        .subscribeOn(Schedulers.computation())
+
+    observable.subscribe(object: Observer<Any> {
+        override fun onSubscribe(d: Disposable) {
+//            TODO("Not yet implemented")
+        }
+
+        override fun onNext(t: Any) {
+//            TODO("Not yet implemented")
+        }
+
+        override fun onError(e: Throwable) {
+//            TODO("Not yet implemented")
+        }
+
+        override fun onComplete() {
+//            TODO("Not yet implemented")
+        }
+
+    })
+    Log.d(RXTAG, "${trace()} obj = ${obj.toString()}")
 }
+
+private fun readList(reader: JsonReader, obj: Any, prop: MutableMap<String, Prop>, emitter: Emitter<Any>){
+    val root = path
+
+    path = "$root["
+    Log.d(RXTAG, "${trace()} path = $path")
+    level ++
+    reader.beginArray()
+    while (reader.hasNext()){
+        if (path in prop.keys && prop[path]!!.property.returnType.classifier == MutableList::class){
+            val list = prop[path]!!.property.getter.call(obj) as MutableList<Any>
+            when (reader.peek()){
+                JsonToken.STRING -> {list.add(reader.nextString())}
+                JsonToken.BEGIN_ARRAY -> {readList(reader, obj, prop)}
+                JsonToken.BEGIN_OBJECT -> {
+                    val inst = prop[path]!!.type.createInstance()
+                    Log.d(RXTAG, "${trace()} inst = $inst")
+                    readObject(reader, inst, prop)
+                    list.add(inst)
+                }
+                JsonToken.NUMBER -> {list.add(reader.nextString())}
+                JsonToken.NULL -> {reader.skipValue()}
+                JsonToken.BOOLEAN -> {reader.nextBoolean()}
+                else -> {throw Exception( JSON_CURVE )}
+            }
+        }
+        else{
+            when (reader.peek()){
+                JsonToken.STRING -> {reader.nextString()}
+                JsonToken.BEGIN_ARRAY -> {readList(reader, obj, prop)}
+                JsonToken.BEGIN_OBJECT -> {readObject(reader, obj, prop)}
+                JsonToken.NUMBER -> {reader.nextString()}
+                JsonToken.NULL -> {reader.skipValue()}
+                JsonToken.BOOLEAN -> {reader.nextBoolean()}
+                else -> {throw Exception( JSON_CURVE )}
+            }
+        }
+    }
+    reader.endArray()
+    path = root
+    level --
+}
+
+private  fun readObject(reader: JsonReader, obj: Any, prop: MutableMap<String, Prop>, emitter: Emitter<Any>){
+    val root = path
+    level ++
+    reader.beginObject()
+    var name = ""
+    while (reader.hasNext()){
+        when (reader.peek()){
+            JsonToken.BEGIN_ARRAY -> {readList(reader, obj, prop)}
+            JsonToken.BEGIN_OBJECT -> {readObject(reader, obj, prop)}
+            JsonToken.NAME -> {
+                name = reader.nextName()
+                path = "$root.$name"
+                Log.d(RXTAG, "${trace()} path = $path")
+            }
+            else -> {
+                if (path in prop.keys){
+                    if (reader.peek() == JsonToken.NULL) reader.skipValue()
+                    else {
+                        Log.d(RXTAG, "${trace()} action = ${prop[path]!!.action}")
+                        prop[path]!!.property.setter.call(obj, prop[path]!!.action())
+                    }
+                }
+                else
+                    reader.skipValue()
+            }
+        }
+    }
+    reader.endObject()
+    path = root
+    level --
+}
+
 
 fun parseJson(json: String, obj: Any): Any {
     val reader = JsonReader(StringReader(json))
